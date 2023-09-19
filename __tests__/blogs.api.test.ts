@@ -64,15 +64,17 @@ describe('/blogs', () => {
 	})
 
 	it('should create new blog with correct data and return created blog', async () => {
-		await request(app).post('/blogs')
+		const response = await request(app).post('/blogs')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
-			.expect(201, {
-				id: expect.any(String),
-				name: validInputData.name,
-				description: validInputData.description,
-				websiteUrl: validInputData.websiteUrl,
-			});
+			.expect(201);
+
+		expect(response.body).toEqual({
+			id: expect.any(String),
+			name: validInputData.name,
+			description: validInputData.description,
+			websiteUrl: validInputData.websiteUrl,
+		});
 	})
 
 	it('should not create new blog and return validation errors', async () => {

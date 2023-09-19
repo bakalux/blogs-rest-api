@@ -28,6 +28,7 @@ class BlogsController {
 		// TODO: data validation
 		try {
 			blogsRepository.updateById(req.params.id, data);
+			res.status(204).send();
 		} catch (e) {
 			res.status(404).send();
 		}
@@ -36,6 +37,7 @@ class BlogsController {
 	deleteOne(req: Request, res: Response): void {
 		try {
 			blogsRepository.deleteById(req.params.id);
+			res.status(204).send();
 		} catch (e) {
 			res.status(404).send();
 		}
