@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { app, server } from '../index';
-import { BlogInputModel, BlogViewModel } from '../features/blogs/blogs-model';
+import { app, server } from '../src/index';
+import { BlogInputModel, BlogViewModel } from '../src/features/blogs/blogs-model';
 
 
 const AUTHORIZATION_TOKEN = 'admin:qwerty';
