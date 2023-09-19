@@ -49,22 +49,22 @@ describe('/blogs', () => {
 		server.close();
 	});
 
-	it('should return 200 with correct blogs', () => {
-		request(app).get('/blogs')
+	it('should return 200 with correct blogs', async () => {
+		await request(app).get('/blogs')
 			.expect(200, [postedBlog1, postedBlog2]);
 	});
 
-	it('should return 200 with correct blog', () => {
-		request(app).get(`/blogs/${ postedBlog1.id }`)
+	it('should return 200 with correct blog', async () => {
+		await request(app).get(`/blogs/${ postedBlog1.id }`)
 	});
 
-	it('should not delete blog and return 404', () => {
-		request(app).get('/blogs/asdfasdfasdf4352345')
+	it('should not delete blog and return 404', async () => {
+		await request(app).get('/blogs/asdfasdfasdf4352345')
 			.expect(404)
 	})
 
-	it('should create new blog with correct data and return created blog', () => {
-		request(app).post('/blogs')
+	it('should create new blog with correct data and return created blog', async () => {
+		await request(app).post('/blogs')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
 			.expect(201, {
@@ -75,14 +75,14 @@ describe('/blogs', () => {
 			});
 	})
 
-	it('should not create new blog and return validation errors', () => {
+	it('should not create new blog and return validation errors', async () => {
 		const wrongData: UnknownBlogInputModel = {
 			name: 4124312,
 			description: [],
 			websiteUrl: 'https:fasdf.com',
 		}
 
-		request(app).post('/blogs')
+		await request(app).post('/blogs')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send(wrongData)
 			.expect(400, {
@@ -102,22 +102,21 @@ describe('/blogs', () => {
 			})
 	})
 
-	it('should not create blog and return 401 unauthorized', () => {
-
-		request(app).post('/blogs')
+	it('should not create blog and return 401 unauthorized', async () => {
+		await request(app).post('/blogs')
 			.send(validInputData)
 			.expect(401)
 	})
 
-	it('should update blog and return 204 with no content', () => {
-		request(app).put(`/blogs/${ postedBlog2.id }`)
+	it('should update blog and return 204 with no content', async () => {
+		await request(app).put(`/blogs/${ postedBlog2.id }`)
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
 			.expect(204)
 	})
 
-	it('should not update blog and return 400 with validation errors', () => {
-		request(app).put(`/blogs/${ postedBlog2.id }`)
+	it('should not update blog and return 400 with validation errors', async () => {
+		await request(app).put(`/blogs/${ postedBlog2.id }`)
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send({})
 			.expect({
@@ -137,32 +136,32 @@ describe('/blogs', () => {
 			})
 	});
 
-	it('should not update blog and return 401 unauthorized', () => {
-		request(app).put(`/blogs/${ postedBlog2.id }`)
+	it('should not update blog and return 401 unauthorized', async () => {
+		await request(app).put(`/blogs/${ postedBlog2.id }`)
 			.send(validInputData)
 			.expect(401)
 	})
 
-	it('should not update blog and return 404', () => {
-		request(app).put('/blogs/asdfasdfasdf4352345')
+	it('should not update blog and return 404', async () => {
+		await request(app).put('/blogs/asdfasdfasdf4352345')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.expect(404)
 	})
 
-	it('should delete blog and return 204 no content', () => {
-		request(app).delete(`/blogs/${ postedBlog2.id }`)
+	it('should delete blog and return 204 no content', async () => {
+		await request(app).delete(`/blogs/${ postedBlog2.id }`)
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.expect(204)
 	})
 
-	it('should not delete blog and return 404', () => {
-		request(app).delete('/blogs/asdfasdfasdf4352345')
+	it('should not delete blog and return 404', async () => {
+		await request(app).delete('/blogs/asdfasdfasdf4352345')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.expect(404)
 	})
 
-	it ('should delete all data and return 204', () => {
-		request(app).delete('/testing/all-data')
+	it('should delete all data and return 204', async () => {
+		await request(app).delete('/testing/all-data')
 			.expect(204, {})
 	})
 })
