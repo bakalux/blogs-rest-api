@@ -18,14 +18,13 @@ class BlogsController {
 
 	create(req: Request, res: Response): void {
 		const data = req.body;
-		// TODO: data validation
 		const blog = blogsRepository.create(data);
 		res.status(201).send(blog);
 	}
 
 	updateOne(req: Request, res: Response): void {
 		const data = req.body;
-		// TODO: data validation
+
 		try {
 			blogsRepository.updateById(req.params.id, data);
 			res.status(204).send();
