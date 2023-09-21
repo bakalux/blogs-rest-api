@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { app, server } from '../src/index';
 import { BlogInputModel, BlogViewModel } from '../src/features/blogs/blogs-model';
+import {blogsTestManager} from "./blogs-test-manager";
 
 
 const AUTHORIZATION_TOKEN = 'admin:qwerty';
@@ -27,10 +28,7 @@ describe('/blogs', () => {
 			description: 'mock description',
 			websiteUrl: 'https://vk.com',
 		}
-		const res1 = await request(app).post('/blogs')
-			.set('authorization', AUTHORIZATION_TOKEN)
-			.send(input1)
-			.expect(201);
+		const res1 = await blogsTestManager.createBlog(input1, 201);
 		postedBlog1 = res1.body;
 
 		const input2: BlogInputModel = {
@@ -38,10 +36,7 @@ describe('/blogs', () => {
 			description: 'mock description 2',
 			websiteUrl: 'https://vk2.com',
 		}
-		const res2 = await request(app).post('/blogs')
-			.set('authorization', AUTHORIZATION_TOKEN)
-			.send(input2)
-			.expect(201);
+		const res2 = await blogsTestManager.createBlog(input2, 201);
 		postedBlog2 = res2.body;
 	})
 
@@ -64,10 +59,7 @@ describe('/blogs', () => {
 	})
 
 	it('should create new blog with correct data and return created blog', async () => {
-		const response = await request(app).post('/blogs')
-			.set('authorization', AUTHORIZATION_TOKEN)
-			.send(validInputData)
-			.expect(201);
+		const response = await blogsTestManager.createBlog(validInputData, 201);
 
 		expect(response.body).toEqual({
 			id: expect.any(String),
@@ -84,10 +76,7 @@ describe('/blogs', () => {
 			websiteUrl: 'https:fasdf.com',
 		}
 
-		const res = await request(app).post('/blogs')
-			.set('authorization', AUTHORIZATION_TOKEN)
-			.send(wrongData)
-			.expect(400);
+		const res = await blogsTestManager.createBlog(wrongData as BlogInputModel, 400);
 
 		expect(res.body).toEqual({
 			errorsMessages: [
@@ -108,9 +97,7 @@ describe('/blogs', () => {
 	})
 
 	it('should not create blog and return 401 unauthorized', async () => {
-		await request(app).post('/blogs')
-			.send(validInputData)
-			.expect(401)
+		await blogsTestManager.createBlogUnauthorized(validInputData);
 	})
 
 	it('should update blog and return 204 with no content', async () => {
