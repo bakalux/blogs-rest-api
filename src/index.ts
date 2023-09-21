@@ -14,6 +14,6 @@ app.use(cors());
 app.use('/testing', testingRouter)
 app.use('/blogs', blogsRouter)
 
-export const server = app.listen(() => {
-	console.log('server is listenning on port' + PORT);
+export const server = app.listen(PORT,() => {
+	console.log('server is listenning on port ' + PORT);
 })

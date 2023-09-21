@@ -1,10 +1,12 @@
 import { Router } from "express";
 import { body } from 'express-validator';
 
-import { blogsController } from './blogs-controller';
 import { checkAuthorization } from '../../middlewares/authorization';
 import { inputValidation } from '../../middlewares/input-validation';
+import { blogsRepository } from './blogs-repository';
+import { Controller } from '../../common/controller';
 
+export const blogsController = new Controller(blogsRepository);
 const blogsRouter = Router()
 
 blogsRouter.use(checkAuthorization);
