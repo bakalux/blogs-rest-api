@@ -37,7 +37,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		}
 
 		this._blogs[index] = {
-			...this._blogs[index],
+			id: this._blogs[index].id,
 			...data,
 		}
 
@@ -46,7 +46,6 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 
 	public deleteById(id: string): void {
 		const index = this._blogs.findIndex((blog: BlogViewModel) => blog.id === id);
-		console.log('before deletion', this._blogs);
 
 		if (index === -1) {
 			throw new Error('No such blog');

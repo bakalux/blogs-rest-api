@@ -84,24 +84,27 @@ describe('/blogs', () => {
 			websiteUrl: 'https:fasdf.com',
 		}
 
-		await request(app).post('/blogs')
+		const res = await request(app).post('/blogs')
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send(wrongData)
-			.expect(400, {
-				errorsMessages: [{
+			.expect(400);
+
+		expect(res.body).toEqual({
+			errorsMessages: [
+				{
 					message: expect.any(String),
 					field: 'name'
 				},
-					{
-						message: expect.any(String),
-						field: 'websiteUrl'
-					},
-					{
-						message: expect.any(String),
-						field: 'name'
-					},
-				]
-			})
+				{
+					message: expect.any(String),
+					field: 'description'
+				},
+				{
+					message: expect.any(String),
+					field: 'websiteUrl'
+				},
+			]
+		});
 	})
 
 	it('should not create blog and return 401 unauthorized', async () => {
@@ -118,24 +121,27 @@ describe('/blogs', () => {
 	})
 
 	it('should not update blog and return 400 with validation errors', async () => {
-		await request(app).put(`/blogs/${ postedBlog2.id }`)
+		const res = await request(app).put(`/blogs/${ postedBlog2.id }`)
 			.set('authorization', AUTHORIZATION_TOKEN)
 			.send({})
-			.expect({
-				errorsMessages: [{
+			.expect(400);
+
+		expect(res.body).toEqual({
+			errorsMessages: [
+				{
 					message: expect.any(String),
 					field: 'name'
 				},
-					{
-						message: expect.any(String),
-						field: 'websiteUrl'
-					},
-					{
-						message: expect.any(String),
-						field: 'name'
-					},
-				]
-			})
+				{
+					message: expect.any(String),
+					field: 'description'
+				},
+				{
+					message: expect.any(String),
+					field: 'websiteUrl'
+				},
+			]
+		});
 	});
 
 	it('should not update blog and return 401 unauthorized', async () => {
@@ -147,6 +153,7 @@ describe('/blogs', () => {
 	it('should not update blog and return 404', async () => {
 		await request(app).put('/blogs/asdfasdfasdf4352345')
 			.set('authorization', AUTHORIZATION_TOKEN)
+			.send(validInputData)
 			.expect(404)
 	})
 
