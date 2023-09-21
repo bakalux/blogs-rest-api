@@ -2,31 +2,44 @@ import request from 'supertest';
 import { app, server } from '../src/index';
 import { PostInputModel, PostViewModel } from '../src/features/posts/posts-model';
 import { postsTestManager, AUTHORIZATION_TOKEN } from './posts-test-manager';
+import { blogsTestManager } from "./blogs-test-manager";
+import { BlogInputModel, BlogViewModel } from "../src/features/blogs/blogs-model";
 
 
 type UnknownPostInputModel = {
 	[K in keyof PostInputModel]: unknown;
 }
 
-const validInputData: PostInputModel = {
-	title: 'valid name',
-	shortDescription: 'valid description',
-	content: 'https://valid.com',
-	blogId: 'CHANGE THIS',
-}
-
 describe('/posts', () => {
 	let postedPost1: PostViewModel;
 	let postedPost2: PostViewModel;
+    let validInputData: PostInputModel;
+    let bindingBlog: BlogViewModel;
 	beforeAll(async () => {
 		await request(app).delete('/testing/all-data')
 			.expect(204)
+
+        const blogInput: BlogInputModel = {
+			name: 'mock blog',
+			description: 'mock description',
+			websiteUrl: 'https://vk.com',
+		}
+        const { body: blog } = await blogsTestManager.createBlog(blogInput, 201);
+
+        bindingBlog = blog;
+
+        validInputData = {
+            title: 'valid name',
+            shortDescription: 'valid description',
+            content: 'https://valid.com',
+            blogId: bindingBlog.id,
+        }
 
 		const input1: PostInputModel = {
 			title: 'valid title 1',
 			shortDescription: 'valid shortDescription 1',
 			content: 'https://valid.com',
-			blogId: 'CHANGE THIS',
+			blogId: bindingBlog.id,
 		}
 
 		const res1 = await postsTestManager.createPost(input1, 201)
@@ -36,7 +49,7 @@ describe('/posts', () => {
 			title: 'valid title 2',
 			shortDescription: 'valid shortDescription 2',
 			content: 'asdfasdf',
-			blogId: 'CHANGE THIS',
+			blogId: bindingBlog.id,
 		}
 
 		const res2 = await postsTestManager.createPost(input2, 201)

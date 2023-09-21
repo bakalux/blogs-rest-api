@@ -11,7 +11,11 @@ const titleValidation = body('title').notEmpty().isString().isLength({ max: 30 }
 const shortDescriptionValidation = body('shortDescription').notEmpty().isString().isLength({ max: 100 });
 const contentValidation = body('content').notEmpty().isString().isLength({ max: 1000 });
 const blogIdValidation = body('blogId').notEmpty().isString().custom((value) => {
-	blogsRepository.getById(value);
+	const blog = blogsRepository.getById(value);
+	if (!blog) {
+		throw new Error('blog is not found by blog id');
+	}
+	return true;
 });
 
 const postsController = new Controller(postsRepository);
@@ -37,6 +41,7 @@ postsRouter.put('/:id',
 	shortDescriptionValidation,
 	contentValidation,
 	blogIdValidation,
+	inputValidation,
 	postsController.updateOne
 );
 
