@@ -11,9 +11,10 @@ export function checkAuthorization(req: Request, res: Response, next: NextFuncti
 		return;
 	}
 
-	const encoded = req.headers.authorization.replace('Basic_', '');
+	const encoded = req.headers.authorization.replace('Basic ', '');
+	console.log('encoded', encoded);
 
-	const buff = new Buffer(encoded);
+	const buff = new Buffer(encoded, 'base64');
 
 	const token = buff.toString('ascii');
 

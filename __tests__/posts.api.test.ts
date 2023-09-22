@@ -1,9 +1,10 @@
 import request from 'supertest';
 import { app, server } from '../src/index';
 import { PostInputModel, PostViewModel } from '../src/features/posts/posts-model';
-import { postsTestManager, AUTHORIZATION_TOKEN } from './posts-test-manager';
+import { postsTestManager } from './posts-test-manager';
 import { blogsTestManager } from "./blogs-test-manager";
 import { BlogInputModel, BlogViewModel } from "../src/features/blogs/blogs-model";
+import { AUTHORIZATION_TOKEN } from "./consts";
 
 
 type UnknownPostInputModel = {
@@ -125,14 +126,14 @@ describe('/posts', () => {
 
 	it('should update post and return 204 with no content', async () => {
 		await request(app).put(`/posts/${ postedPost2.id }`)
-			.set('authorization', AUTHORIZATION_TOKEN)
+			.set('Authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
 			.expect(204)
 	})
 
 	it('should not update post and return 400 with validation errors', async () => {
 		const res = await request(app).put(`/posts/${ postedPost2.id }`)
-			.set('authorization', AUTHORIZATION_TOKEN)
+			.set('Authorization', AUTHORIZATION_TOKEN)
 			.send({})
 			.expect(400);
 
@@ -166,20 +167,20 @@ describe('/posts', () => {
 
 	it('should not update post and return 404', async () => {
 		await request(app).put('/posts/asdfasdfasdf4352345')
-			.set('authorization', AUTHORIZATION_TOKEN)
+			.set('Authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
 			.expect(404)
 	})
 
 	it('should delete post and return 204 no content', async () => {
 		await request(app).delete(`/posts/${ postedPost2.id }`)
-			.set('authorization', AUTHORIZATION_TOKEN)
+			.set('Authorization', AUTHORIZATION_TOKEN)
 			.expect(204)
 	})
 
 	it('should not delete post and return 404', async () => {
 		await request(app).delete('/posts/asdfasdfasdf4352345')
-			.set('authorization', AUTHORIZATION_TOKEN)
+			.set('Authorization', AUTHORIZATION_TOKEN)
 			.expect(404)
 	})
 
