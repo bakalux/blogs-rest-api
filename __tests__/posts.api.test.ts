@@ -129,6 +129,14 @@ describe('/posts', () => {
 			.set('Authorization', AUTHORIZATION_TOKEN)
 			.send(validInputData)
 			.expect(204)
+
+		const res = await request(app).get(`/posts/${ postedPost2.id }`)
+			.expect(200)
+
+		expect(res.body).toEqual({
+			...validInputData,
+			id: expect.any(String),
+		});
 	})
 
 	it('should not update post and return 400 with validation errors', async () => {
