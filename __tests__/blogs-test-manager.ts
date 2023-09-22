@@ -1,14 +1,14 @@
 import request from 'supertest';
 
-import {app} from '../src/index';
-import {BlogInputModel} from "../src/features/blogs/blogs-model";
+import { app } from '../src/index';
+import { BlogInputModel } from "../src/features/blogs/blogs-model";
+import { AUTHORIZATION_TOKEN } from "./consts";
 
-export const AUTHORIZATION_TOKEN = 'admin:qwerty';
 
 export const blogsTestManager = {
     async createBlog(data: BlogInputModel, expectedStatusCode: number) {
         const response = await request(app).post('/blogs')
-            .set('authorization', AUTHORIZATION_TOKEN)
+            .set('Authorization', AUTHORIZATION_TOKEN)
             .send(data)
             .expect(expectedStatusCode)
 
