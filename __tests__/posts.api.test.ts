@@ -43,7 +43,7 @@ describe('/posts', () => {
 			blogId: bindingBlog.id,
 		}
 
-		const res1 = await postsTestManager.createPost(input1, 201)
+		const res1 = await postsTestManager.createPost(input1, 201, bindingBlog.name)
 		postedPost1 = res1.body;
 
 		const input2: PostInputModel = {
@@ -53,7 +53,7 @@ describe('/posts', () => {
 			blogId: bindingBlog.id,
 		}
 
-		const res2 = await postsTestManager.createPost(input2, 201)
+		const res2 = await postsTestManager.createPost(input2, 201, bindingBlog.name)
 		postedPost2 = res2.body;
 	})
 
@@ -76,15 +76,15 @@ describe('/posts', () => {
 	})
 
 	it('should create new post with correct data and return created post', async () => {
-		const response = await postsTestManager.createPost(validInputData, 201);
+		const response = await postsTestManager.createPost(validInputData, 201, bindingBlog.name);
 
 		expect(response.body).toEqual({
 			id: expect.any(String),
 			title: validInputData.title,
 			shortDescription: validInputData.shortDescription,
 			content: validInputData.content,
-			blogId: validInputData.blogId,
-			blogName: validInputData.title + validInputData.shortDescription
+			blogId: bindingBlog.id,
+			blogName: bindingBlog.name,
 		});
 	})
 
@@ -135,6 +135,7 @@ describe('/posts', () => {
 
 		expect(res.body).toEqual({
 			...validInputData,
+			blogName: bindingBlog.name,
 			id: expect.any(String),
 		});
 	})
