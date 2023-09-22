@@ -6,9 +6,9 @@ import { inputValidation } from '../../middlewares/input-validation';
 import { blogsRepository } from './blogs-repository';
 import { Controller } from '../../common/controller';
 
-const nameValidation = body('name').notEmpty().isString().isLength({ max: 15 });
-const descriptionValidation = body('description').notEmpty().isString().isLength({ max: 500 });
-const urlValidation = body('websiteUrl').notEmpty().isURL().isLength({ max: 100 });
+const nameValidation = body('name').isString().trim().notEmpty().isLength({ max: 15 });
+const descriptionValidation = body('description').isString().trim().notEmpty().isLength({ max: 500 });
+const urlValidation = body('websiteUrl').trim().notEmpty().isURL().isLength({ max: 100 });
 
 const blogsController = new Controller(blogsRepository);
 const blogsRouter = Router()

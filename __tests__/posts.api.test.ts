@@ -90,9 +90,9 @@ describe('/posts', () => {
 
 	it('should not create new post and return validation errors', async () => {
 		const wrongData: UnknownPostInputModel = {
-			title: 4124312,
-			shortDescription: [],
-			content: undefined,
+			title: '            ',
+			shortDescription: '',
+			content: '               ',
 			blogId: false,
 		}
 
@@ -134,7 +134,12 @@ describe('/posts', () => {
 	it('should not update post and return 400 with validation errors', async () => {
 		const res = await request(app).put(`/posts/${ postedPost2.id }`)
 			.set('Authorization', AUTHORIZATION_TOKEN)
-			.send({})
+			.send({
+				blogId: '',
+				title: '          ',
+				shortDescription: '      ',
+				content: '            ',
+			})
 			.expect(400);
 
 		expect(res.body).toEqual({
