@@ -1,8 +1,15 @@
 import { PostInputModel, PostViewModel } from './posts-model';
 import { IRepository } from '../../common/irepository';
+import { BlogInputModel, BlogViewModel } from "../blogs/blogs-model";
+import { blogsRepository } from "../blogs/blogs-repository";
 
 class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	private _posts: PostViewModel[] = [];
+	private _blogsRepository: IRepository<BlogViewModel, BlogInputModel>;
+
+	public constructor(blogsRepository: IRepository<BlogViewModel, BlogInputModel>) {
+		this._blogsRepository = blogsRepository;
+	}
 
 	public getAll(): PostViewModel[] {
 		return this._posts;
@@ -19,10 +26,11 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	}
 
 	public create(data: PostInputModel): PostViewModel {
+		const { name: blogName } = this._blogsRepository.getById(data.blogId);
 		const post = {
 			...data,
 			id: Math.floor(Math.random() * 1000).toString(),
-			blogName: data.title + data.shortDescription,
+			blogName,
 		};
 
 		this._posts.push(post);
@@ -37,9 +45,12 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			throw new Error('No such post');
 		}
 
+		const { name: blogName } = this._blogsRepository.getById(data.blogId);
+
 		this._posts[index] = {
 			...data,
 			id: this._posts[index].id,
+			blogName,
 		}
 
 		return this._posts[index];
@@ -60,4 +71,4 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	}
 }
 
-export const postsRepository = new PostsRepository();
+export const postsRepository = new PostsRepository(blogsRepository);
