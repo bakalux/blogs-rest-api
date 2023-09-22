@@ -108,7 +108,11 @@ describe('/blogs', () => {
 	it('should not update blog and return 400 with validation errors', async () => {
 		const res = await request(app).put(`/blogs/${ postedBlog2.id }`)
 			.set('Authorization', AUTHORIZATION_TOKEN)
-			.send({})
+			.send({
+				name: '',
+				description: '                    ',
+				websiteUrl: '            ',
+			})
 			.expect(400);
 
 		expect(res.body).toEqual({

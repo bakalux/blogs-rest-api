@@ -40,7 +40,6 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		this._posts[index] = {
 			...data,
 			id: this._posts[index].id,
-			blogName: data.title + data.shortDescription,
 		}
 
 		return this._posts[index];
