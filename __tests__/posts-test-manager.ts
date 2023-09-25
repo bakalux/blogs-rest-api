@@ -1,6 +1,6 @@
 import request from 'supertest';
 
-import { app } from '../src/index';
+import { app } from '../src/app';
 import { PostInputModel } from "../src/features/posts/posts-model";
 import { AUTHORIZATION_TOKEN } from "./consts";
 

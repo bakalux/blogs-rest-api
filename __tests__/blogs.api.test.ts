@@ -1,8 +1,10 @@
 import request from 'supertest';
-import { app, server } from '../src/index';
+import { app } from '../src/app';
 import { BlogInputModel, BlogViewModel } from '../src/features/blogs/blogs-model';
 import { blogsTestManager } from "./blogs-test-manager";
 import { AUTHORIZATION_TOKEN } from "./consts";
+import { server } from "./server";
+import {runDb, closeDbConnection} from "../src/db";
 
 type UnknownBlogInputModel = {
 	[K in keyof BlogInputModel]: unknown;
@@ -18,6 +20,7 @@ describe('/blogs', () => {
 	let postedBlog1: BlogViewModel;
 	let postedBlog2: BlogViewModel;
 	beforeAll(async () => {
+		await runDb();
 		await request(app).delete('/testing/all-data')
 			.expect(204)
 
@@ -38,7 +41,8 @@ describe('/blogs', () => {
 		postedBlog2 = res2.body;
 	})
 
-	afterAll(() => {
+	afterAll(async () => {
+		await closeDbConnection();
 		server.close();
 	});
 
