@@ -2,72 +2,80 @@ import { PostInputModel, PostViewModel } from './posts-model';
 import { IRepository } from '../../common/irepository';
 import { BlogInputModel, BlogViewModel } from "../blogs/blogs-model";
 import { blogsRepository } from "../blogs/blogs-repository";
+import { getCollection } from "../../db";
 
 class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
-	private _posts: PostViewModel[] = [];
+	private _collection = getCollection<PostViewModel>('posts');
 	private _blogsRepository: IRepository<BlogViewModel, BlogInputModel>;
 
 	public constructor(blogsRepository: IRepository<BlogViewModel, BlogInputModel>) {
 		this._blogsRepository = blogsRepository;
 	}
 
-	public getAll(): PostViewModel[] {
-		return this._posts;
+	public async getAll(): Promise<PostViewModel[]> {
+		return await this._collection.find({},{ projection: { _id: 0  }}).toArray();
 	}
 
-	public getById(id: string): PostViewModel {
-		const post = this._posts.find((post: PostViewModel) => post.id === id);
+	public async getById(id: string): Promise<PostViewModel | null> {
+		const post = await this._collection.findOne({ id },{ projection: { _id: 0  }});
 
 		if (!post) {
-			throw new Error('No such post');
+			return null;
 		}
 
 		return post;
 	}
 
-	public create(data: PostInputModel): PostViewModel {
-		const { name: blogName } = this._blogsRepository.getById(data.blogId);
+	public async create(data: PostInputModel): Promise<PostViewModel> {
+		const blog = await this._blogsRepository.getById(data.blogId);
+		if (blog === null) {
+			throw new Error("No such blog");
+		}
+
+		const date = new Date();
 		const post = {
 			...data,
-			id: Math.floor(Math.random() * 1000).toString(),
-			blogName,
+			id: date.toString(),
+			blogName: blog.name,
+			createdAt: date.toISOString(),
 		};
 
-		this._posts.push(post);
+		await this._collection.insertOne(post);
 
 		return post;
 	}
 
-	public updateById(id: string, data: PostInputModel): PostViewModel {
-		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
+	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
 
-		if (index === -1) {
-			throw new Error('No such post');
+		const blog = await this._blogsRepository.getById(data.blogId);
+
+		if (blog === null) {
+			return null;
 		}
 
-		const { name: blogName } = this._blogsRepository.getById(data.blogId);
 
-		this._posts[index] = {
+		const updating = {
 			...data,
-			id: this._posts[index].id,
-			blogName,
+			id,
+		};
+
+		const result = await this._collection.updateOne({ id }, { $set: updating });
+
+		if (result.matchedCount === 0) {
+			return null;
 		}
 
-		return this._posts[index];
+		return updating;
 	}
 
-	public deleteById(id: string): void {
-		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
+	public async deleteById(id: string): Promise<boolean> {
+		const result = await this._collection.deleteOne({ id });
 
-		if (index === -1) {
-			throw new Error('No such blog');
-		}
-
-		this._posts = [...this._posts.slice(0, index), ...this._posts.slice(index + 1)]
+		return result.deletedCount !== 0;
 	}
 
-	public deleteAll(): void {
-		this._posts = [];
+	public async deleteAll(): Promise<void> {
+		await this._collection.deleteMany();
 	}
 }
 

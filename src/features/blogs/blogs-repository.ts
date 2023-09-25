@@ -1,61 +1,62 @@
 import { BlogInputModel, BlogViewModel } from './blogs-model';
 import { IRepository } from '../../common/irepository';
+import { getCollection } from "../../db";
 
 class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
-	private _blogs: BlogViewModel[] = [];
+	private _collection = getCollection<BlogViewModel>('blogs');
 
-	public getAll(): BlogViewModel[] {
-		return this._blogs;
+	public async getAll(): Promise<BlogViewModel[]> {
+		return await this._collection.find({}, { projection: { _id: 0  }}).toArray();
 	}
 
-	public getById(id: string): BlogViewModel {
-		const blog = this._blogs.find((blog: BlogViewModel) => blog.id === id);
-
+	public async getById(id: string): Promise<BlogViewModel | null> {
+		const blog = await this._collection.findOne({ id }, { projection: { _id: 0  }});
 		if (!blog) {
-			throw new Error('No such blog');
+			return null;
 		}
 
 		return blog;
 	}
 
-	public create(data: BlogInputModel): BlogViewModel {
+	public async create(data: BlogInputModel): Promise<BlogViewModel> {
+		const date = new Date();
 		const blog = {
 			...data,
-			id: Math.floor(Math.random() * 1000).toString(),
+			id: date.toString(),
+			isMembership: false,
+			createdAt: date.toISOString(),
 		};
 
-		this._blogs.push(blog);
+		await this._collection.insertOne(blog);
 
 		return blog;
 	}
 
-	public updateById(id: string, data: BlogInputModel): BlogViewModel {
-		const index = this._blogs.findIndex((blog: BlogViewModel) => blog.id === id);
-
-		if (index === -1) {
-			throw new Error('No such blog');
-		}
-
-		this._blogs[index] = {
-			id: this._blogs[index].id,
+	public async updateById(id: string, data: BlogInputModel): Promise<BlogViewModel | null> {
+		const updating = {
 			...data,
+			id
+		}
+		const result = await this._collection.updateOne(
+			{ id },
+			{ $set: updating },
+		);
+
+		if (result.matchedCount === 0) {
+			return null;
 		}
 
-		return this._blogs[index];
+		return updating;
 	}
 
-	public deleteById(id: string): void {
-		const index = this._blogs.findIndex((blog: BlogViewModel) => blog.id === id);
+	public async deleteById(id: string): Promise<boolean> {
+		const result = await this._collection.deleteOne({ id });
 
-		if (index === -1) {
-			throw new Error('No such blog');
-		}
-
-		this._blogs = [...this._blogs.slice(0, index), ...this._blogs.slice(index + 1)]
+		return result.deletedCount !== 0;
 	}
 
-	public deleteAll(): void {
-		this._blogs = [];
+	public async deleteAll(): Promise<void> {
+		await this._collection.deleteMany();
 	}
 }
 

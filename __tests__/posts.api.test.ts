@@ -1,10 +1,12 @@
 import request from 'supertest';
-import { app, server } from '../src/index';
+import { app } from '../src/app';
 import { PostInputModel, PostViewModel } from '../src/features/posts/posts-model';
 import { postsTestManager } from './posts-test-manager';
 import { blogsTestManager } from "./blogs-test-manager";
 import { BlogInputModel, BlogViewModel } from "../src/features/blogs/blogs-model";
 import { AUTHORIZATION_TOKEN } from "./consts";
+import { server } from "./server";
+import { runDb, closeDbConnection } from "../src/db";
 
 
 type UnknownPostInputModel = {
@@ -17,6 +19,7 @@ describe('/posts', () => {
     let validInputData: PostInputModel;
     let bindingBlog: BlogViewModel;
 	beforeAll(async () => {
+		await runDb();
 		await request(app).delete('/testing/all-data')
 			.expect(204)
 
@@ -57,7 +60,8 @@ describe('/posts', () => {
 		postedPost2 = res2.body;
 	})
 
-	afterAll(() => {
+	afterAll( async () => {
+		await closeDbConnection();
 		server.close();
 	});
 
