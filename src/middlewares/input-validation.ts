@@ -11,7 +11,6 @@ export function inputValidation(req: Request, res: Response, next: NextFunction)
 				field: error.path,
 			}))
 		});
-
 		return;
 	}
 
