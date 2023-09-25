@@ -1,0 +1,5 @@
+
+###
+GET http://localhost:3006/blogs
+###
+GET http://localhost:3006/blogs/1695661966154

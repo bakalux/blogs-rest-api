@@ -6,11 +6,11 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 	private _collection = getCollection<BlogViewModel>('blogs');
 
 	public async getAll(): Promise<BlogViewModel[]> {
-		return await this._collection.find({}, { projection: { _id: false } }).toArray();
+		return await this._collection.find({}, { projection: { _id: 0  }}).toArray();
 	}
 
 	public async getById(id: string): Promise<BlogViewModel | null> {
-		const blog = await this._collection.findOne({ id }, { projection: { _id: false } });
+		const blog = await this._collection.findOne({ id }, { projection: { _id: 0  }});
 		if (!blog) {
 			return null;
 		}
@@ -19,9 +19,12 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 	}
 
 	public async create(data: BlogInputModel): Promise<BlogViewModel> {
+		const date = new Date();
 		const blog = {
 			...data,
-			id: Date.now().toString(),
+			id: date.toString(),
+			isMembership: false,
+			createdAt: date.toISOString(),
 		};
 
 		await this._collection.insertOne(blog);
@@ -36,7 +39,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		}
 		const result = await this._collection.updateOne(
 			{ id },
-			updating
+			{ $set: updating },
 		);
 
 		if (result.matchedCount === 0) {

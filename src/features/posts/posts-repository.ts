@@ -13,11 +13,11 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	}
 
 	public async getAll(): Promise<PostViewModel[]> {
-		return await this._collection.find({},{ projection: { _id: false } }).toArray();
+		return await this._collection.find({},{ projection: { _id: 0  }}).toArray();
 	}
 
 	public async getById(id: string): Promise<PostViewModel | null> {
-		const post = await this._collection.findOne({ id },{ projection: { _id: false } });
+		const post = await this._collection.findOne({ id },{ projection: { _id: 0  }});
 
 		if (!post) {
 			return null;
@@ -32,10 +32,12 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			throw new Error("No such blog");
 		}
 
+		const date = new Date();
 		const post = {
 			...data,
-			id: Date.now().toString(),
+			id: date.toString(),
 			blogName: blog.name,
+			createdAt: date.toISOString(),
 		};
 
 		await this._collection.insertOne(post);
@@ -57,7 +59,7 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			id,
 		};
 
-		const result = await this._collection.updateOne({ id }, updating);
+		const result = await this._collection.updateOne({ id }, { $set: updating });
 
 		if (result.matchedCount === 0) {
 			return null;
