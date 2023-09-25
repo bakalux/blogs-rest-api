@@ -11,26 +11,30 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		this._blogsRepository = blogsRepository;
 	}
 
-	public getAll(): PostViewModel[] {
+	public async getAll(): Promise<PostViewModel[]> {
 		return this._posts;
 	}
 
-	public getById(id: string): PostViewModel {
+	public async getById(id: string): Promise<PostViewModel | null> {
 		const post = this._posts.find((post: PostViewModel) => post.id === id);
 
 		if (!post) {
-			throw new Error('No such post');
+			return null;
 		}
 
 		return post;
 	}
 
-	public create(data: PostInputModel): PostViewModel {
-		const { name: blogName } = this._blogsRepository.getById(data.blogId);
+	public async create(data: PostInputModel): Promise<PostViewModel> {
+		const blog = await this._blogsRepository.getById(data.blogId);
+		if (blog === null) {
+			throw new Error("No such blog");
+		}
+
 		const post = {
 			...data,
 			id: Math.floor(Math.random() * 1000).toString(),
-			blogName,
+			blogName: blog.name,
 		};
 
 		this._posts.push(post);
@@ -38,35 +42,40 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		return post;
 	}
 
-	public updateById(id: string, data: PostInputModel): PostViewModel {
+	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
 		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
 
 		if (index === -1) {
-			throw new Error('No such post');
+			return null;
 		}
 
-		const { name: blogName } = this._blogsRepository.getById(data.blogId);
+		const blog = await this._blogsRepository.getById(data.blogId);
+
+		if (blog === null) {
+			return null;
+		}
 
 		this._posts[index] = {
 			...data,
 			id: this._posts[index].id,
-			blogName,
+			blogName: blog.name,
 		}
 
 		return this._posts[index];
 	}
 
-	public deleteById(id: string): void {
+	public async deleteById(id: string): Promise<boolean> {
 		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
 
 		if (index === -1) {
-			throw new Error('No such blog');
+			return false;
 		}
 
-		this._posts = [...this._posts.slice(0, index), ...this._posts.slice(index + 1)]
+		this._posts = [...this._posts.slice(0, index), ...this._posts.slice(index + 1)];
+		return true;
 	}
 
-	public deleteAll(): void {
+	public async deleteAll(): Promise<void> {
 		this._posts = [];
 	}
 }

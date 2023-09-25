@@ -4,21 +4,21 @@ import { IRepository } from '../../common/irepository';
 class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 	private _blogs: BlogViewModel[] = [];
 
-	public getAll(): BlogViewModel[] {
+	public async getAll(): Promise<BlogViewModel[]> {
 		return this._blogs;
 	}
 
-	public getById(id: string): BlogViewModel {
+	public async getById(id: string): Promise<BlogViewModel | null> {
 		const blog = this._blogs.find((blog: BlogViewModel) => blog.id === id);
 
 		if (!blog) {
-			throw new Error('No such blog');
+			return null;
 		}
 
 		return blog;
 	}
 
-	public create(data: BlogInputModel): BlogViewModel {
+	public async create(data: BlogInputModel): Promise<BlogViewModel> {
 		const blog = {
 			...data,
 			id: Math.floor(Math.random() * 1000).toString(),
@@ -29,11 +29,11 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		return blog;
 	}
 
-	public updateById(id: string, data: BlogInputModel): BlogViewModel {
+	public async updateById(id: string, data: BlogInputModel): Promise<BlogViewModel | null> {
 		const index = this._blogs.findIndex((blog: BlogViewModel) => blog.id === id);
 
 		if (index === -1) {
-			throw new Error('No such blog');
+			return null;
 		}
 
 		this._blogs[index] = {
@@ -44,17 +44,18 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		return this._blogs[index];
 	}
 
-	public deleteById(id: string): void {
+	public async deleteById(id: string): Promise<boolean> {
 		const index = this._blogs.findIndex((blog: BlogViewModel) => blog.id === id);
 
 		if (index === -1) {
-			throw new Error('No such blog');
+			return false;
 		}
 
-		this._blogs = [...this._blogs.slice(0, index), ...this._blogs.slice(index + 1)]
+		this._blogs = [...this._blogs.slice(0, index), ...this._blogs.slice(index + 1)];
+		return true;
 	}
 
-	public deleteAll(): void {
+	public async deleteAll(): Promise<void> {
 		this._blogs = [];
 	}
 }

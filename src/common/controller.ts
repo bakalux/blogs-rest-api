@@ -10,42 +10,49 @@ export class Controller<TViewModel, TInputModel> {
 	}
 
 
-	public getAll = (req: Request, res: Response): void => {
-		res.status(200).send(this._repository.getAll());
+	public getAll = async (req: Request, res: Response): Promise<void> => {
+		const data  = await this._repository.getAll();
+		res.status(200).send(data);
 	}
 
-	public getOne = (req: Request, res: Response): void => {
-		try {
-			const item = this._repository.getById(req.params.id);
-			res.status(200).send(item);
-		} catch (e) {
+	public getOne = async (req: Request, res: Response): Promise<void> => {
+		const item = await this._repository.getById(req.params.id);
+
+		if (item === null) {
 			res.status(404).send();
+			return;
 		}
+
+		res.status(200).send(item);
 	}
 
-	public create = (req: Request, res: Response): void => {
+	public create = async (req: Request, res: Response): Promise<void> => {
 		const data = req.body;
-		const item = this._repository.create(data);
+		const item = await this._repository.create(data);
 		res.status(201).send(item);
 	}
 
-	public updateOne = (req: Request, res: Response): void => {
+	public updateOne = async (req: Request, res: Response): Promise<void> => {
 		const data = req.body;
 
-		try {
-			this._repository.updateById(req.params.id, data);
+			const blog = await this._repository.updateById(req.params.id, data);
+
+			if (!blog) {
+				res.status(404).send();
+				return;
+			}
+
 			res.status(204).send();
-		} catch (e) {
-			res.status(404).send();
-		}
 	}
 
-	public deleteOne = (req: Request, res: Response): void => {
-		try {
-			this._repository.deleteById(req.params.id);
-			res.status(204).send();
-		} catch (e) {
+	public deleteOne = async (req: Request, res: Response): Promise<void> => {
+		const isDeleted = await this._repository.deleteById(req.params.id);
+
+		if(!isDeleted) {
 			res.status(404).send();
+			return;
 		}
+
+		res.status(204).send();
 	}
 }
