@@ -2,9 +2,10 @@ import { PostInputModel, PostViewModel } from './posts-model';
 import { IRepository } from '../../common/irepository';
 import { BlogInputModel, BlogViewModel } from "../blogs/blogs-model";
 import { blogsRepository } from "../blogs/blogs-repository";
+import { getCollection } from "../../db";
 
 class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
-	private _posts: PostViewModel[] = [];
+	private _collection = getCollection<PostViewModel>('posts');
 	private _blogsRepository: IRepository<BlogViewModel, BlogInputModel>;
 
 	public constructor(blogsRepository: IRepository<BlogViewModel, BlogInputModel>) {
@@ -12,11 +13,11 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	}
 
 	public async getAll(): Promise<PostViewModel[]> {
-		return this._posts;
+		return await this._collection.find({},{ projection: { _id: false } }).toArray();
 	}
 
 	public async getById(id: string): Promise<PostViewModel | null> {
-		const post = this._posts.find((post: PostViewModel) => post.id === id);
+		const post = await this._collection.findOne({ id },{ projection: { _id: false } });
 
 		if (!post) {
 			return null;
@@ -33,21 +34,16 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 
 		const post = {
 			...data,
-			id: Math.floor(Math.random() * 1000).toString(),
+			id: Date.now().toString(),
 			blogName: blog.name,
 		};
 
-		this._posts.push(post);
+		await this._collection.insertOne(post);
 
 		return post;
 	}
 
 	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
-		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
-
-		if (index === -1) {
-			return null;
-		}
 
 		const blog = await this._blogsRepository.getById(data.blogId);
 
@@ -55,28 +51,29 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			return null;
 		}
 
-		this._posts[index] = {
+
+		const updating = {
 			...data,
-			id: this._posts[index].id,
-			blogName: blog.name,
+			id,
+		};
+
+		const result = await this._collection.updateOne({ id }, updating);
+
+		if (result.matchedCount === 0) {
+			return null;
 		}
 
-		return this._posts[index];
+		return updating;
 	}
 
 	public async deleteById(id: string): Promise<boolean> {
-		const index = this._posts.findIndex((post: PostViewModel) => post.id === id);
+		const result = await this._collection.deleteOne({ id });
 
-		if (index === -1) {
-			return false;
-		}
-
-		this._posts = [...this._posts.slice(0, index), ...this._posts.slice(index + 1)];
-		return true;
+		return result.deletedCount !== 0;
 	}
 
 	public async deleteAll(): Promise<void> {
-		this._posts = [];
+		await this._collection.deleteMany();
 	}
 }
 
