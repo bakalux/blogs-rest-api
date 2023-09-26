@@ -22,7 +22,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		const date = new Date();
 		const blog = {
 			...data,
-			id: date.toString(),
+			id: date.getTime().toString(),
 			isMembership: false,
 			createdAt: date.toISOString(),
 		};
@@ -46,7 +46,9 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 			return null;
 		}
 
-		return updating;
+		const updated = await this._collection.findOne({ id }, { projection: { _id: 0  }});
+
+		return updated;
 	}
 
 	public async deleteById(id: string): Promise<boolean> {

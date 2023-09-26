@@ -35,7 +35,7 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		const date = new Date();
 		const post = {
 			...data,
-			id: date.toString(),
+			id: date.getTime().toString(),
 			blogName: blog.name,
 			createdAt: date.toISOString(),
 		};
@@ -65,7 +65,9 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			return null;
 		}
 
-		return updating;
+		const updated = await this._collection.findOne({id}, {projection: {_id: 0}});
+
+		return updated;
 	}
 
 	public async deleteById(id: string): Promise<boolean> {
