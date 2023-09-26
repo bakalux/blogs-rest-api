@@ -67,6 +67,8 @@ describe('/blogs', () => {
 			id: expect.any(String),
 			name: validInputData.name,
 			description: validInputData.description,
+			createdAt: expect.any(String),
+			isMembership: expect.any(Boolean),
 			websiteUrl: validInputData.websiteUrl,
 		});
 	})

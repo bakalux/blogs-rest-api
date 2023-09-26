@@ -40,19 +40,17 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			createdAt: date.toISOString(),
 		};
 
-		await this._collection.insertOne(post);
+		await this._collection.insertOne({ ...post });
 
 		return post;
 	}
 
 	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
-
 		const blog = await this._blogsRepository.getById(data.blogId);
 
 		if (blog === null) {
 			return null;
 		}
-
 
 		const updating = {
 			...data,
@@ -65,7 +63,7 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 			return null;
 		}
 
-		const updated = await this._collection.findOne({id}, {projection: {_id: 0}});
+		const updated = await this._collection.findOne({id}, { projection: {_id: 0 } });
 
 		return updated;
 	}
@@ -77,7 +75,7 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	}
 
 	public async deleteAll(): Promise<void> {
-		await this._collection.deleteMany();
+		await this._collection.deleteMany({});
 	}
 }
 
