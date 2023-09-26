@@ -22,7 +22,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		const date = new Date();
 		const blog = {
 			...data,
-			id: Math.floor(Math.random() * 1000),
+			id: Math.floor(Math.random() * 1000).toString(),
 			isMembership: false,
 			createdAt: date.toISOString(),
 		};

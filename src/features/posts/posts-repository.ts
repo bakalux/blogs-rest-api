@@ -35,7 +35,7 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		const date = new Date();
 		const post = {
 			...data,
-			id: Math.floor(Math.random() * 1000),
+			id: Math.floor(Math.random() * 1000).toString(),
 			blogName: blog.name,
 			createdAt: date.toISOString(),
 		};
