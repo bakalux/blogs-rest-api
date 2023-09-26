@@ -86,6 +86,7 @@ describe('/posts', () => {
 			id: expect.any(String),
 			title: validInputData.title,
 			shortDescription: validInputData.shortDescription,
+			createdAt: expect.any(String),
 			content: validInputData.content,
 			blogId: bindingBlog.id,
 			blogName: bindingBlog.name,
@@ -140,6 +141,7 @@ describe('/posts', () => {
 		expect(res.body).toEqual({
 			...validInputData,
 			blogName: bindingBlog.name,
+			createdAt: expect.any(String),
 			id: expect.any(String),
 		});
 	})

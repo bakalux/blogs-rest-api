@@ -27,7 +27,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 			createdAt: date.toISOString(),
 		};
 
-		await this._collection.insertOne(blog);
+		await this._collection.insertOne({ ...blog });
 
 		return blog;
 	}
@@ -58,7 +58,7 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 	}
 
 	public async deleteAll(): Promise<void> {
-		await this._collection.deleteMany();
+		await this._collection.deleteMany({});
 	}
 }
 
