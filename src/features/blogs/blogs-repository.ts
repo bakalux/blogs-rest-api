@@ -2,7 +2,7 @@ import { BlogInputModel, BlogViewModel } from './blogs-model';
 import { IRepository } from '../../common/irepository';
 import { getCollection } from "../../db";
 
-class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
+export class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 	private _collection = getCollection<BlogViewModel>('blogs');
 
 	public async getAll(): Promise<BlogViewModel[]> {
@@ -18,18 +18,10 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		return blog;
 	}
 
-	public async create(data: BlogInputModel): Promise<BlogViewModel> {
-		const date = new Date();
-		const blog = {
-			...data,
-			id: Math.floor(Math.random() * 1000).toString(),
-			isMembership: false,
-			createdAt: date.toISOString(),
-		};
+	public async create(data: BlogViewModel): Promise<BlogViewModel> {
+		await this._collection.insertOne({ ...data });
 
-		await this._collection.insertOne({ ...blog });
-
-		return blog;
+		return data;
 	}
 
 	public async updateById(id: string, data: BlogInputModel): Promise<BlogViewModel | null> {
@@ -61,5 +53,3 @@ class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
 		await this._collection.deleteMany({});
 	}
 }
-
-export const blogsRepository = new BlogsRepository();

@@ -3,14 +3,15 @@ import { body } from 'express-validator';
 
 import { checkAuthorization } from '../../middlewares/authorization';
 import { inputValidation } from '../../middlewares/input-validation';
-import { blogsRepository } from './blogs-repository';
 import { Controller } from '../../common/controller';
+import { BlogsService } from "../../domain/blogs-service";
 
 const nameValidation = body('name').isString().trim().notEmpty().isLength({ max: 15 });
 const descriptionValidation = body('description').isString().trim().notEmpty().isLength({ max: 500 });
 const urlValidation = body('websiteUrl').trim().notEmpty().isURL().isLength({ max: 100 });
 
-const blogsController = new Controller(blogsRepository);
+const blogsService = new BlogsService();
+const blogsController = new Controller(blogsService);
 const blogsRouter = Router()
 
 blogsRouter.use(checkAuthorization);
