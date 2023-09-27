@@ -1,16 +1,9 @@
 import { PostInputModel, PostViewModel } from './posts-model';
 import { IRepository } from '../../common/irepository';
-import { BlogInputModel, BlogViewModel } from "../blogs/blogs-model";
-import { blogsRepository } from "../blogs/blogs-repository";
 import { getCollection } from "../../db";
 
-class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
+export class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 	private _collection = getCollection<PostViewModel>('posts');
-	private _blogsRepository: IRepository<BlogViewModel, BlogInputModel>;
-
-	public constructor(blogsRepository: IRepository<BlogViewModel, BlogInputModel>) {
-		this._blogsRepository = blogsRepository;
-	}
 
 	public async getAll(): Promise<PostViewModel[]> {
 		return await this._collection.find({},{ projection: { _id: 0  }}).toArray();
@@ -26,32 +19,12 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		return post;
 	}
 
-	public async create(data: PostInputModel): Promise<PostViewModel> {
-		const blog = await this._blogsRepository.getById(data.blogId);
-		if (blog === null) {
-			throw new Error("No such blog");
-		}
-
-		const date = new Date();
-		const post = {
-			...data,
-			id: Math.floor(Math.random() * 1000).toString(),
-			blogName: blog.name,
-			createdAt: date.toISOString(),
-		};
-
-		await this._collection.insertOne({ ...post });
-
-		return post;
+	public async create(data: PostViewModel): Promise<PostViewModel> {
+		await this._collection.insertOne({ ...data });
+		return data;
 	}
 
 	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
-		const blog = await this._blogsRepository.getById(data.blogId);
-
-		if (blog === null) {
-			return null;
-		}
-
 		const updating = {
 			...data,
 			id,
@@ -78,5 +51,3 @@ class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
 		await this._collection.deleteMany({});
 	}
 }
-
-export const postsRepository = new PostsRepository(blogsRepository);
