@@ -5,14 +5,6 @@ import { BlogsRepository } from "../features/blogs/blogs-repository";
 export class BlogsService implements IService<BlogViewModel, BlogInputModel>{
     private _blogsRepository = new BlogsRepository();
 
-    public async getAll(): Promise<BlogViewModel[]> {
-        return this._blogsRepository.getAll();
-    }
-
-    public async getById(id: string): Promise<BlogViewModel | null> {
-        return this._blogsRepository.getById(id);
-    }
-
     public async create(data: BlogInputModel): Promise<BlogViewModel> {
         const date = new Date();
         const blog = {

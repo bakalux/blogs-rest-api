@@ -5,13 +5,15 @@ import { checkAuthorization } from '../../middlewares/authorization';
 import { inputValidation } from '../../middlewares/input-validation';
 import { Controller } from '../../common/controller';
 import { BlogsService } from "../../domain/blogs-service";
+import { BlogsQueryRepository } from "./blogs-query-repository";
 
 const nameValidation = body('name').isString().trim().notEmpty().isLength({ max: 15 });
 const descriptionValidation = body('description').isString().trim().notEmpty().isLength({ max: 500 });
 const urlValidation = body('websiteUrl').trim().notEmpty().isURL().isLength({ max: 100 });
 
+const blogsQueryRepository = new BlogsQueryRepository();
 const blogsService = new BlogsService();
-const blogsController = new Controller(blogsService);
+const blogsController = new Controller(blogsService, blogsQueryRepository);
 const blogsRouter = Router()
 
 blogsRouter.use(checkAuthorization);
