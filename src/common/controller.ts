@@ -1,21 +1,27 @@
 import { Request, Response } from 'express';
 
 import { IService } from "../domain/iservice";
+import { IQueryRepository } from "./iquery-repository";
 
 export class Controller<TViewModel, TInputModel> {
 	private _service: IService<TViewModel, TInputModel>
+	private _queryRepository: IQueryRepository<TViewModel, TInputModel>
 
-	constructor(service: IService<TViewModel, TInputModel>) {
+	constructor(
+		service: IService<TViewModel, TInputModel>,
+		queryRepository: IQueryRepository<TViewModel, TInputModel>
+	) {
 		this._service = service;
+		this._queryRepository = queryRepository;
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
-		const data  = await this._service.getAll();
+		const data  = await this._queryRepository.getAll();
 		res.status(200).send(data);
 	}
 
 	public getOne = async (req: Request, res: Response): Promise<void> => {
-		const item = await this._service.getById(req.params.id);
+		const item = await this._queryRepository.getById(req.params.id);
 
 		if (item === null) {
 			res.status(404).send();

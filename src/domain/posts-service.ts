@@ -1,23 +1,16 @@
 import { PostInputModel, PostViewModel } from "../features/posts/posts-model";
 import { IService } from "./iservice";
 import { PostsRepository } from "../features/posts/posts-repository";
-import { BlogsRepository } from "../features/blogs/blogs-repository";
+import { BlogsQueryRepository } from "../features/blogs/blogs-query-repository";
 
 export class PostsService implements IService<PostViewModel, PostInputModel>{
     private _postsRepository = new PostsRepository();
-    private _blogsRepository = new BlogsRepository();
-
-    public async getAll(): Promise<PostViewModel[]> {
-        return this._postsRepository.getAll();
-    }
-
-    public async getById(id: string): Promise<PostViewModel | null> {
-        return this._postsRepository.getById(id);
-    }
+    private _blogsQueryRepository = new BlogsQueryRepository();
 
     public async create(data: PostInputModel): Promise<PostViewModel> {
-        const blog = await this._blogsRepository.getById(data.blogId);
-		if (blog === null) {
+        const blog = await this._blogsQueryRepository.getById(data.blogId);
+
+        if (blog === null) {
 			throw new Error("No such blog");
 		}
 
@@ -33,7 +26,7 @@ export class PostsService implements IService<PostViewModel, PostInputModel>{
     }
 
     public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
-        const blog = await this._blogsRepository.getById(data.blogId);
+        const blog = await this._blogsQueryRepository.getById(data.blogId);
 
         if (blog === null) {
             return null;
@@ -51,7 +44,7 @@ export class PostsService implements IService<PostViewModel, PostInputModel>{
     }
 
     public async isValidBlogId(blogId: string): Promise<boolean> {
-        const blog = await this._blogsRepository.getById(blogId);
+        const blog = await this._blogsQueryRepository.getById(blogId);
 
         return Boolean(blog);
     }
