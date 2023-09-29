@@ -1,16 +1,35 @@
-import { BlogInputModel, BlogViewModel } from './blogs-model';
-import { IQueryRepository } from '../../common/iquery-repository';
+import { BlogViewModel } from './blogs-model';
+import { IQueryRepository, QueryOptions, SortDirection } from '../../common/iquery-repository';
 import { getCollection } from "../../db";
+import { getSkip } from "../../common/utils";
+import { Filter, Sort } from "mongodb";
 
-export class BlogsQueryRepository implements IQueryRepository<BlogViewModel, BlogInputModel> {
+export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 	private _collection = getCollection<BlogViewModel>('blogs');
 
-	public async getAll(): Promise<BlogViewModel[]> {
-		return await this._collection.find({}, { projection: { _id: 0  }}).toArray();
+	public async getAll(options: Partial<QueryOptions>): Promise<BlogViewModel[]> {
+		const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = options;
+
+		const filter: Filter<BlogViewModel> = {};
+
+		if (searchNameTerm) {
+			filter.name = { $regex: searchNameTerm };
+		}
+
+		const sorting: Sort = {}
+		const sortField = sortBy ? sortBy : 'createdAt';
+		sorting[sortField] = sortDirection === SortDirection.Desc ? -1 : 1;
+
+		return await this._collection
+			.find(filter, { projection: { _id: 0 } })
+			.sort(sorting)
+			.skip(getSkip(pageNumber, pageSize))
+			.limit(pageSize)
+			.toArray();
 	}
 
 	public async getById(id: string): Promise<BlogViewModel | null> {
-		const blog = await this._collection.findOne({ id }, { projection: { _id: 0  }});
+		const blog = await this._collection.findOne({ id }, { projection: { _id: 0 } });
 		if (!blog) {
 			return null;
 		}

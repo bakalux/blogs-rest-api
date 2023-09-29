@@ -1,22 +1,31 @@
 import { Request, Response } from 'express';
 
 import { IService } from "../domain/iservice";
-import { IQueryRepository } from "./iquery-repository";
+import { IQueryRepository, SortDirection } from "./iquery-repository";
 
 export class Controller<TViewModel, TInputModel> {
 	private _service: IService<TViewModel, TInputModel>
-	private _queryRepository: IQueryRepository<TViewModel, TInputModel>
+	private _queryRepository: IQueryRepository<TViewModel>
 
 	constructor(
 		service: IService<TViewModel, TInputModel>,
-		queryRepository: IQueryRepository<TViewModel, TInputModel>
+		queryRepository: IQueryRepository<TViewModel>
 	) {
 		this._service = service;
 		this._queryRepository = queryRepository;
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
-		const data  = await this._queryRepository.getAll();
+		const { sortDirection, sortBy, searchNameTerm, pageNumber, pageSize } = req.query;
+
+		const data  = await this._queryRepository.getAll({
+			sortDirection: sortDirection as SortDirection,
+			sortBy,
+			searchNameTerm,
+			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
+			pageSize: typeof pageSize === 'string' ? Number(pageSize) : 10,
+		});
+
 		res.status(200).send(data);
 	}
 
