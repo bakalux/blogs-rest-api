@@ -17,15 +17,14 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		}
 
 		const sorting: Sort = {}
-		if (sortBy) {
-			sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
-		}
-
+		const sortField = sortBy ? sortBy : 'createdAt';
+		sorting[sortField] = sortDirection === SortDirection.Desc ? -1 : 1;
 
 		return await this._collection
 			.find(filter, { projection: { _id: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
+			.limit(pageSize)
 			.toArray();
 	}
 

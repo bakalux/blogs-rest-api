@@ -40,9 +40,9 @@ describe('/posts', () => {
         }
 
 		const input1: PostInputModel = {
-			title: 'valid title 1',
-			shortDescription: 'valid shortDescription 1',
-			content: 'https://valid.com',
+			title: 'fancy valid title 1',
+			shortDescription: 'some shortDescription 1',
+			content: 'beta',
 			blogId: bindingBlog.id,
 		}
 
@@ -50,9 +50,9 @@ describe('/posts', () => {
 		postedPost1 = res1.body;
 
 		const input2: PostInputModel = {
-			title: 'valid title 2',
-			shortDescription: 'valid shortDescription 2',
-			content: 'asdfasdf',
+			title: 'super title 2',
+			shortDescription: 'awesome shortDescription 2',
+			content: 'giga',
 			blogId: bindingBlog.id,
 		}
 
@@ -68,6 +68,37 @@ describe('/posts', () => {
 	it('should return 200 with correct posts', async () => {
 		await request(app).get('/posts')
 			.expect(200, [postedPost1, postedPost2]);
+	});
+
+
+	it('should correctly return number of items according to pageSize and pageNumber', async () => {
+		const res = await request(app).get('/posts/?pageSize=1&pageNumber=2')
+			.expect(200);
+
+		expect(res.body).toEqual([postedPost2]);
+
+		if (Array.isArray(res.body)) {
+			expect(res.body.length).toEqual(1);
+		}
+	});
+
+	it('should correctly handle sorting direction', async () => {
+		const res1 = await request(app).get('/posts/?sortDirection=desc')
+			.expect(200);
+
+		expect(res1.body).toEqual([postedPost2, postedPost1]);
+
+		const res2 = await request(app).get('/posts/?sortDirection=asc')
+			.expect(200);
+
+		expect(res2.body).toEqual([postedPost1, postedPost2]);
+	});
+
+	it('should correctly sort by sortBy field', async () => {
+		const res = await request(app).get('/posts/?sortBy=shortDescription')
+			.expect(200);
+
+		expect(res.body).toEqual([postedPost2, postedPost1]);
 	});
 
 	it('should return 200 with correct post', async () => {

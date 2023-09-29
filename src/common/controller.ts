@@ -16,14 +16,14 @@ export class Controller<TViewModel, TInputModel> {
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
-		const { sortDirection, sortBy, searchNameTerm, pageNumber, pageSize } = req.params;
+		const { sortDirection, sortBy, searchNameTerm, pageNumber, pageSize } = req.query;
 
 		const data  = await this._queryRepository.getAll({
 			sortDirection: sortDirection as SortDirection,
 			sortBy,
 			searchNameTerm,
-			pageNumber: Number(pageNumber),
-			pageSize: Number(pageSize),
+			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
+			pageSize: typeof pageSize === 'string' ? Number(pageSize) : 10,
 		});
 
 		res.status(200).send(data);

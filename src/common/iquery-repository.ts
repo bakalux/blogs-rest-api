@@ -1,5 +1,5 @@
 export interface IQueryRepository<TViewModel> {
-    getAll(options: Partial<QueryOptions>): Promise<TViewModel[]>;
+    getAll(query: object): Promise<TViewModel[]>;
 
     getById(id: string): Promise<TViewModel | null>;
 }
@@ -10,9 +10,9 @@ export const enum SortDirection {
 }
 
 export interface QueryOptions {
-    searchNameTerm: string;
-    sortBy: string;
-    sortDirection: SortDirection;
-    pageNumber: number;
-    pageSize: number;
+    searchNameTerm: any;
+    sortBy: any;
+    sortDirection: any;
+    pageNumber: any;
+    pageSize: any;
 }

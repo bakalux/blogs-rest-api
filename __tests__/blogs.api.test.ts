@@ -25,16 +25,16 @@ describe('/blogs', () => {
 			.expect(204)
 
 		const input1: BlogInputModel = {
-			name: 'mock blog',
-			description: 'mock description',
+			name: 'fancy blog',
+			description: 'some description',
 			websiteUrl: 'https://vk.com',
 		}
 		const res1 = await blogsTestManager.createBlog(input1, 201);
 		postedBlog1 = res1.body;
 
 		const input2: BlogInputModel = {
-			name: 'mock blog 2',
-			description: 'mock description 2',
+			name: 'super blog 2',
+			description: 'awesome description 2',
 			websiteUrl: 'https://vk2.com',
 		}
 		const res2 = await blogsTestManager.createBlog(input2, 201);
@@ -50,6 +50,44 @@ describe('/blogs', () => {
 		await request(app).get('/blogs')
 			.expect(200, [postedBlog1, postedBlog2]);
 	});
+
+	it('should correctly return number of items according to pageSize and pageNumber', async () => {
+		const res = await request(app).get('/blogs/?pageSize=1&pageNumber=2')
+			.expect(200);
+
+		expect(res.body).toEqual([postedBlog2]);
+
+		if (Array.isArray(res.body)) {
+			expect(res.body.length).toEqual(1);
+		}
+	});
+
+	it('should correctly return search items by searchNameTerm', async () => {
+		const res = await request(app).get('/blogs/?searchNameTerm=fancy')
+			.expect(200);
+
+		expect(res.body).toEqual([postedBlog1]);
+	});
+
+	it('should correctly handle sorting direction', async () => {
+		const res1 = await request(app).get('/blogs/?sortDirection=desc')
+			.expect(200);
+
+		expect(res1.body).toEqual([postedBlog2, postedBlog1]);
+
+		const res2 = await request(app).get('/blogs/?sortDirection=asc')
+			.expect(200);
+
+		expect(res2.body).toEqual([postedBlog1, postedBlog2]);
+	});
+
+	it('should correctly sort by sortBy field', async () => {
+		const res = await request(app).get('/blogs/?sortBy=description')
+			.expect(200);
+
+		expect(res.body).toEqual([postedBlog2, postedBlog1]);
+	});
+
 
 	it('should return 200 with correct blog', async () => {
 		await request(app).get(`/blogs/${ postedBlog1.id }`)
