@@ -3,17 +3,9 @@ import { Request, Response } from 'express';
 import { IService } from "../domain/iservice";
 import { IQueryRepository, SortDirection } from "./iquery-repository";
 
-export class Controller<TViewModel, TInputModel> {
-	private _service: IService<TViewModel, TInputModel>
-	private _queryRepository: IQueryRepository<TViewModel>
-
-	constructor(
-		service: IService<TViewModel, TInputModel>,
-		queryRepository: IQueryRepository<TViewModel>
-	) {
-		this._service = service;
-		this._queryRepository = queryRepository;
-	}
+export abstract class ControllerBase<TViewModel, TInputModel> {
+	 protected abstract _service: IService<TViewModel, TInputModel>
+	 protected abstract _queryRepository: IQueryRepository<TViewModel>
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
 		const { sortDirection, sortBy, searchNameTerm, pageNumber, pageSize } = req.query;

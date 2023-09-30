@@ -1,19 +1,22 @@
 import { Router } from "express";
-import { body } from 'express-validator';
 
 import { checkAuthorization } from '../../middlewares/authorization';
 import { inputValidation } from '../../middlewares/input-validation';
-import { Controller } from '../../common/controller';
+import { BlogsController } from './blogs-controller';
 import { BlogsService } from "../../domain/blogs-service";
 import { BlogsQueryRepository } from "./blogs-query-repository";
-
-const nameValidation = body('name').isString().trim().notEmpty().isLength({ max: 15 });
-const descriptionValidation = body('description').isString().trim().notEmpty().isLength({ max: 500 });
-const urlValidation = body('websiteUrl').trim().notEmpty().isURL().isLength({ max: 100 });
+import { PostsService } from '../../domain/posts-service';
+import { descriptionValidation, nameValidation, urlValidation } from '../../common/validation/blogs-validation';
+import {
+	contentValidation,
+	shortDescriptionValidation,
+	titleValidation
+} from '../../common/validation/posts-validation';
 
 const blogsQueryRepository = new BlogsQueryRepository();
 const blogsService = new BlogsService();
-const blogsController = new Controller(blogsService, blogsQueryRepository);
+const postsService = new PostsService();
+const blogsController = new BlogsController(blogsService, blogsQueryRepository, postsService);
 const blogsRouter = Router()
 
 blogsRouter.use(checkAuthorization);
@@ -39,5 +42,14 @@ blogsRouter.put('/:id',
 );
 
 blogsRouter.delete('/:id', blogsController.deleteOne);
+
+blogsRouter.get('/:id/posts', blogsController.getBlogPosts);
+blogsRouter.post('/:id/posts',
+	titleValidation,
+	shortDescriptionValidation,
+	contentValidation,
+	inputValidation,
+	blogsController.createPostForBlog,
+);
 
 export default blogsRouter;

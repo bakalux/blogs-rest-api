@@ -9,7 +9,7 @@ export const postsTestManager = {
         const response = await request(app).post('/posts')
             .set('Authorization', AUTHORIZATION_TOKEN)
             .send(data)
-            .expect(expectedStatusCode)
+            .expect(expectedStatusCode);
 
         if (expectedStatusCode === 201) {
             const created = response.body;
