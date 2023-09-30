@@ -9,3 +9,9 @@ export interface BlogViewModel extends BlogInputModel {
 	isMembership: boolean;
 	createdAt: string
 }
+
+export interface BlogPostInputModel {
+	title: string;
+	shortDescription: string;
+	content: string;
+}

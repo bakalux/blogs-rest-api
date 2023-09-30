@@ -1,10 +1,12 @@
 import request from 'supertest';
 import { app } from '../src/app';
-import { BlogInputModel, BlogViewModel } from '../src/features/blogs/blogs-model';
+import { BlogInputModel, BlogPostInputModel, BlogViewModel } from '../src/features/blogs/blogs-model';
 import { blogsTestManager } from "./blogs-test-manager";
+import { postsTestManager } from './posts-test-manager';
 import { AUTHORIZATION_TOKEN } from "./consts";
 import { server } from "./server";
-import {runDb, closeDbConnection} from "../src/db";
+import { runDb, closeDbConnection } from "../src/db";
+import { PostInputModel, PostViewModel } from '../src/features/posts/posts-model';
 
 type UnknownBlogInputModel = {
 	[K in keyof BlogInputModel]: unknown;
@@ -189,6 +191,114 @@ describe('/blogs', () => {
 			.send(validInputData)
 			.expect(404)
 	})
+
+
+	it('should return posts by blogId', async () => {
+		const input: PostInputModel = {
+			title: 'fancy valid title 1',
+			shortDescription: 'some shortDescription 1',
+			content: 'beta',
+			blogId: postedBlog1.id,
+		};
+		const res = await postsTestManager.createPost(input, 201, postedBlog1.name);
+		const post: PostViewModel = res.body;
+
+		const postsRes = await request(app).get(`/blogs/${ postedBlog1.id }/posts`);
+		expect(postsRes.body).toEqual([post]);
+	});
+
+	it('should not find posts by not existing blogId and return 404', async () => {
+		await request(app).get('/blogs/not-exisiting-blog-id/posts')
+			.expect(404);
+	});
+
+	it('should create post for existing blog', async () => {
+		const blogInput: BlogInputModel = {
+			name: 'fancy blog',
+			description: 'some description',
+			websiteUrl: 'https://vk.com',
+		};
+
+		const blogRes = await blogsTestManager.createBlog(blogInput, 201);
+
+		const blog = blogRes.body;
+
+		const data: BlogPostInputModel = {
+			title: 'fancy valid title 1',
+			shortDescription: 'some shortDescription 1',
+			content: 'beta',
+		};
+
+		const res = await request(app).post(`/blogs/${ blog.id }/posts`)
+			.set('Authorization', AUTHORIZATION_TOKEN)
+			.send(data)
+			.expect(201);
+
+		expect(res.body).toEqual({
+			id: expect.any(String),
+			createdAt: expect.any(String),
+			blogId: blog.id,
+			blogName: blog.name,
+			title: data.title,
+			shortDescription: data.shortDescription,
+			content: data.content,
+		})
+	});
+
+	it('should not create post with not existing blog id and return 404', async () => {
+		const data: BlogPostInputModel = {
+			title: 'fancy valid title 1',
+			shortDescription: 'some shortDescription 1',
+			content: 'beta',
+		};
+
+		await request(app).post('/blogs/not-existing-blog-id/posts')
+			.set('Authorization', AUTHORIZATION_TOKEN)
+			.send(data)
+			.expect(404);
+	});
+
+	it('should not create post by blog id and return validation errors', async () => {
+		const wrongData = {
+			title: '            ',
+			shortDescription: '',
+			content: '               ',
+		};
+
+		const res = await request(app).post(`/blogs/${ postedBlog2.id }/posts`)
+			.set('Authorization', AUTHORIZATION_TOKEN)
+			.send(wrongData)
+			.expect(400);
+
+		expect(res.body).toEqual({
+			errorsMessages: [
+				{
+					message: expect.any(String),
+					field: 'title'
+				},
+				{
+					message: expect.any(String),
+					field: 'shortDescription'
+				},
+				{
+					message: expect.any(String),
+					field: 'content'
+				},
+			]
+		});
+	});
+
+	it('should not create post by blogId and return 401 unauthorized', async () => {
+		const data: BlogPostInputModel = {
+			title: 'fancy valid title 1',
+			shortDescription: 'some shortDescription 1',
+			content: 'beta',
+		};
+
+		await request(app).post(`/blogs/${ postedBlog2.id }/posts`)
+			.send(data)
+			.expect(401);
+	});
 
 	it('should delete blog and return 204 no content', async () => {
 		await request(app).delete(`/blogs/${ postedBlog2.id }`)
