@@ -16,7 +16,7 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		const filter: Filter<BlogViewModel> = {};
 
 		if (searchNameTerm) {
-			filter.name = { $regex: searchNameTerm };
+			filter.name = { $regex: searchNameTerm, $options: 'i' };
 		}
 
 		const sorting: Sort = {}

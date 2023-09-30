@@ -27,7 +27,7 @@ describe('/blogs', () => {
 			.expect(204)
 
 		const input1: BlogInputModel = {
-			name: 'fancy blog',
+			name: 'Fancy blog',
 			description: 'some description',
 			websiteUrl: 'https://vk.com',
 		}
