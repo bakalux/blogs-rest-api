@@ -5,6 +5,7 @@ import { BlogInputModel, BlogViewModel } from './blogs-model';
 import { BlogsService } from '../../domain/blogs-service';
 import { BlogsQueryRepository } from './blogs-query-repository';
 import { PostsService } from '../../domain/posts-service';
+import { SortDirection } from '../../common/iquery-repository';
 
 export class BlogsController extends ControllerBase<BlogViewModel, BlogInputModel> {
 	protected _queryRepository: BlogsQueryRepository;
@@ -23,13 +24,18 @@ export class BlogsController extends ControllerBase<BlogViewModel, BlogInputMode
 	}
 
 	public getBlogPosts = async (req: Request, res: Response) => {
-		const posts = await this._queryRepository.getBlogPosts(req.params.id);
+		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
+		const posts = await this._queryRepository.getBlogPosts(req.params.id, {
+			sortDirection: sortDirection as SortDirection,
+			sortBy,
+			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
+			pageSize: typeof pageSize === 'string' ? Number(pageSize) : 10,
+		});
 
 		if (posts === null) {
 			res.status(404).send();
 			return;
 		}
-
 		res.status(200).send(posts);
 	}
 

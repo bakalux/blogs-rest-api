@@ -50,13 +50,30 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		return blog;
 	}
 
-	public async getBlogPosts(blogId: string): Promise<PostViewModel[] | null> {
+	public async getBlogPosts(blogId: string, options: Partial<QueryOptions>): Promise<ItemsQueryView<PostViewModel> | null> {
 		const blog = await this._blogsCollection.findOne({ id: blogId }, { projection: { _id: 0 } });
 
 		if (!blog) {
 			return null;
 		}
 
-		return this._postsCollection.find({ blogId }, { projection: { _id: 0 } }).toArray();
+		const filter = { blogId };
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Asc } = options;
+		const sorting: Sort = {}
+		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
+
+		const totalCount = await this._postsCollection.countDocuments(filter);
+		const pagesCount = Math.ceil(totalCount / pageSize);
+
+
+		const items = await this._postsCollection.find(filter, { projection: { _id: 0 } }).toArray();
+
+		return {
+			totalCount,
+			pageSize,
+			page: pageNumber,
+			pagesCount,
+			items,
+		};
 	}
 }

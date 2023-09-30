@@ -238,7 +238,13 @@ describe('/blogs', () => {
 		const post: PostViewModel = res.body;
 
 		const postsRes = await request(app).get(`/blogs/${ postedBlog1.id }/posts`);
-		expect(postsRes.body).toEqual([post]);
+		expect(postsRes.body).toEqual({
+			totalCount: 1,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [post]
+		});
 	});
 
 	it('should not find posts by not existing blogId and return 404', async () => {
