@@ -42,10 +42,4 @@ export class PostsService implements IService<PostViewModel, PostInputModel>{
     public async deleteAll(): Promise<void> {
         await this._postsRepository.deleteAll();
     }
-
-    public async isValidBlogId(blogId: string): Promise<boolean> {
-        const blog = await this._blogsQueryRepository.getById(blogId);
-
-        return Boolean(blog);
-    }
 }
