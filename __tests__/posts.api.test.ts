@@ -16,28 +16,28 @@ type UnknownPostInputModel = {
 describe('/posts', () => {
 	let postedPost1: PostViewModel;
 	let postedPost2: PostViewModel;
-    let validInputData: PostInputModel;
-    let bindingBlog: BlogViewModel;
+	let validInputData: PostInputModel;
+	let bindingBlog: BlogViewModel;
 	beforeAll(async () => {
 		await runDb();
 		await request(app).delete('/testing/all-data')
 			.expect(204)
 
-        const blogInput: BlogInputModel = {
+		const blogInput: BlogInputModel = {
 			name: 'mock blog',
 			description: 'mock description',
 			websiteUrl: 'https://vk.com',
 		}
-        const { body: blog } = await blogsTestManager.createBlog(blogInput, 201);
+		const { body: blog } = await blogsTestManager.createBlog(blogInput, 201);
 
-        bindingBlog = blog;
+		bindingBlog = blog;
 
-        validInputData = {
-            title: 'valid name',
-            shortDescription: 'valid description',
-            content: 'https://valid.com',
-            blogId: bindingBlog.id,
-        }
+		validInputData = {
+			title: 'valid name',
+			shortDescription: 'valid description',
+			content: 'https://valid.com',
+			blogId: bindingBlog.id,
+		}
 
 		const input1: PostInputModel = {
 			title: 'fancy valid title 1',
@@ -60,14 +60,22 @@ describe('/posts', () => {
 		postedPost2 = res2.body;
 	})
 
-	afterAll( async () => {
+	afterAll(async () => {
 		await closeDbConnection();
 		server.close();
 	});
 
 	it('should return 200 with correct posts', async () => {
-		await request(app).get('/posts')
-			.expect(200, [postedPost1, postedPost2]);
+		const res = await request(app).get('/posts')
+			.expect(200);
+
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedPost1, postedPost2]
+		})
 	});
 
 
@@ -75,30 +83,50 @@ describe('/posts', () => {
 		const res = await request(app).get('/posts/?pageSize=1&pageNumber=2')
 			.expect(200);
 
-		expect(res.body).toEqual([postedPost2]);
-
-		if (Array.isArray(res.body)) {
-			expect(res.body.length).toEqual(1);
-		}
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 2,
+			page: 2,
+			pageSize: 1,
+			items: [postedPost2],
+		});
 	});
 
 	it('should correctly handle sorting direction', async () => {
 		const res1 = await request(app).get('/posts/?sortDirection=desc')
 			.expect(200);
 
-		expect(res1.body).toEqual([postedPost2, postedPost1]);
+		expect(res1.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedPost2, postedPost1]
+		});
 
 		const res2 = await request(app).get('/posts/?sortDirection=asc')
 			.expect(200);
 
-		expect(res2.body).toEqual([postedPost1, postedPost2]);
+		expect(res2.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedPost1, postedPost2]
+		});
 	});
 
 	it('should correctly sort by sortBy field', async () => {
 		const res = await request(app).get('/posts/?sortBy=shortDescription')
 			.expect(200);
 
-		expect(res.body).toEqual([postedPost2, postedPost1]);
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedPost2, postedPost1]
+		});
 	});
 
 	it('should return 200 with correct post', async () => {
