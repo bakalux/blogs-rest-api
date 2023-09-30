@@ -49,45 +49,79 @@ describe('/blogs', () => {
 	});
 
 	it('should return 200 with correct blogs', async () => {
-		await request(app).get('/blogs')
-			.expect(200, [postedBlog1, postedBlog2]);
+		const res = await request(app).get('/blogs')
+			.expect(200);
+
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedBlog1, postedBlog2]
+		})
 	});
 
 	it('should correctly return number of items according to pageSize and pageNumber', async () => {
 		const res = await request(app).get('/blogs/?pageSize=1&pageNumber=2')
 			.expect(200);
 
-		expect(res.body).toEqual([postedBlog2]);
-
-		if (Array.isArray(res.body)) {
-			expect(res.body.length).toEqual(1);
-		}
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 2,
+			page: 2,
+			pageSize: 1,
+			items: [postedBlog2],
+		});
 	});
 
 	it('should correctly return search items by searchNameTerm', async () => {
 		const res = await request(app).get('/blogs/?searchNameTerm=fancy')
 			.expect(200);
 
-		expect(res.body).toEqual([postedBlog1]);
+		expect(res.body).toEqual({
+			totalCount: 1,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedBlog1]
+		});
 	});
 
 	it('should correctly handle sorting direction', async () => {
 		const res1 = await request(app).get('/blogs/?sortDirection=desc')
 			.expect(200);
 
-		expect(res1.body).toEqual([postedBlog2, postedBlog1]);
+		expect(res1.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedBlog2, postedBlog1]
+		});
 
 		const res2 = await request(app).get('/blogs/?sortDirection=asc')
 			.expect(200);
 
-		expect(res2.body).toEqual([postedBlog1, postedBlog2]);
+		expect(res2.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedBlog1, postedBlog2]
+		});
 	});
 
 	it('should correctly sort by sortBy field', async () => {
 		const res = await request(app).get('/blogs/?sortBy=description')
 			.expect(200);
 
-		expect(res.body).toEqual([postedBlog2, postedBlog1]);
+		expect(res.body).toEqual({
+			totalCount: 2,
+			pagesCount: 1,
+			page: 1,
+			pageSize: 10,
+			items: [postedBlog2, postedBlog1]
+		});
 	});
 
 

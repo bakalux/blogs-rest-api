@@ -1,7 +1,7 @@
 import { Filter, Sort } from "mongodb";
 
 import { BlogViewModel } from './blogs-model';
-import { IQueryRepository, QueryOptions, SortDirection } from '../../common/iquery-repository';
+import { IQueryRepository, ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
 import { getCollection } from "../../db";
 import { getSkip } from "../../common/utils";
 import { PostViewModel } from '../posts/posts-model';
@@ -10,8 +10,8 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 	private _blogsCollection = getCollection<BlogViewModel>('blogs');
 	private _postsCollection = getCollection<PostViewModel>('posts');
 
-	public async getAll(options: Partial<QueryOptions>): Promise<BlogViewModel[]> {
-		const { pageNumber, pageSize, sortBy, sortDirection, searchNameTerm } = options;
+	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Asc, searchNameTerm } = options;
 
 		const filter: Filter<BlogViewModel> = {};
 
@@ -20,15 +20,25 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		}
 
 		const sorting: Sort = {}
-		const sortField = sortBy ? sortBy : 'createdAt';
-		sorting[sortField] = sortDirection === SortDirection.Desc ? -1 : 1;
+		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
 
-		return await this._blogsCollection
+		const totalCount = await this._blogsCollection.countDocuments(filter);
+		const pagesCount = Math.ceil(totalCount / pageSize);
+
+		const items = await this._blogsCollection
 			.find(filter, { projection: { _id: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)
 			.toArray();
+
+		return {
+			totalCount,
+			pageSize,
+			page: pageNumber,
+			pagesCount,
+			items,
+		}
 	}
 
 	public async getById(id: string): Promise<BlogViewModel | null> {

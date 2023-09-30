@@ -1,5 +1,5 @@
 export interface IQueryRepository<TViewModel> {
-    getAll(query: object): Promise<TViewModel[]>;
+    getAll(query: object): Promise<ItemsQueryView<TViewModel>>;
 
     getById(id: string): Promise<TViewModel | null>;
 }
@@ -15,4 +15,12 @@ export interface QueryOptions {
     sortDirection: any;
     pageNumber: any;
     pageSize: any;
+}
+
+export interface ItemsQueryView<TViewModel> {
+    pagesCount: number;
+    page: number;
+    pageSize: number;
+    totalCount: number;
+    items: TViewModel[];
 }
