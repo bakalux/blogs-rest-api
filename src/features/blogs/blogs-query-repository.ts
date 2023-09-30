@@ -65,8 +65,12 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		const totalCount = await this._postsCollection.countDocuments(filter);
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
-
-		const items = await this._postsCollection.find(filter, { projection: { _id: 0 } }).toArray();
+		const items = await this._postsCollection
+			.find(filter, { projection: { _id: 0 } })
+			.sort(sorting)
+			.skip(getSkip(pageNumber, pageSize))
+			.limit(pageSize)
+			.toArray();
 
 		return {
 			totalCount,
