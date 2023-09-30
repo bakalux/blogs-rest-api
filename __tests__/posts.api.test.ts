@@ -74,7 +74,7 @@ describe('/posts', () => {
 			pagesCount: 1,
 			page: 1,
 			pageSize: 10,
-			items: [postedPost1, postedPost2]
+			items: [postedPost2, postedPost1]
 		})
 	});
 
@@ -88,7 +88,7 @@ describe('/posts', () => {
 			pagesCount: 2,
 			page: 2,
 			pageSize: 1,
-			items: [postedPost2],
+			items: [postedPost1],
 		});
 	});
 
@@ -125,7 +125,7 @@ describe('/posts', () => {
 			pagesCount: 1,
 			page: 1,
 			pageSize: 10,
-			items: [postedPost2, postedPost1]
+			items: [postedPost1, postedPost2]
 		});
 	});
 

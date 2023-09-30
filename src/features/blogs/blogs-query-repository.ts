@@ -11,7 +11,7 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 	private _postsCollection = getCollection<PostViewModel>('posts');
 
 	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
-		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Asc, searchNameTerm } = options;
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchNameTerm } = options;
 
 		const filter: Filter<BlogViewModel> = {};
 
@@ -58,7 +58,7 @@ export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 		}
 
 		const filter = { blogId };
-		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Asc } = options;
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc } = options;
 		const sorting: Sort = {}
 		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
 

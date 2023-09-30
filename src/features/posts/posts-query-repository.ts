@@ -1,4 +1,4 @@
-import { Filter, Sort } from "mongodb";
+import { Sort } from "mongodb";
 
 import { PostViewModel } from './posts-model';
 import { IQueryRepository, ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
@@ -9,18 +9,16 @@ export class PostsQueryRepository implements  IQueryRepository<PostViewModel>{
 	private _collection = getCollection<PostViewModel>('posts');
 
 	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<PostViewModel>> {
-		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Asc } = options;
-
-		const filter: Filter<PostViewModel> = {};
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc } = options;
 
 		const sorting: Sort = {}
 		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
 
-		const totalCount = await this._collection.countDocuments(filter);
+		const totalCount = await this._collection.countDocuments({});
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items =  await this._collection
-			.find(filter, { projection: {_id: 0 } })
+			.find({}, { projection: {_id: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)

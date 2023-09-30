@@ -57,7 +57,7 @@ describe('/blogs', () => {
 			pagesCount: 1,
 			page: 1,
 			pageSize: 10,
-			items: [postedBlog1, postedBlog2]
+			items: [postedBlog2, postedBlog1]
 		})
 	});
 
@@ -70,7 +70,7 @@ describe('/blogs', () => {
 			pagesCount: 2,
 			page: 2,
 			pageSize: 1,
-			items: [postedBlog2],
+			items: [postedBlog1],
 		});
 	});
 
@@ -120,7 +120,7 @@ describe('/blogs', () => {
 			pagesCount: 1,
 			page: 1,
 			pageSize: 10,
-			items: [postedBlog2, postedBlog1]
+			items: [postedBlog1, postedBlog2]
 		});
 	});
 
