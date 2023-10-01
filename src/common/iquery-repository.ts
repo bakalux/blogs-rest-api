@@ -10,7 +10,6 @@ export const enum SortDirection {
 }
 
 export interface QueryOptions {
-    searchNameTerm: any;
     sortBy: any;
     sortDirection: any;
     pageNumber: any;

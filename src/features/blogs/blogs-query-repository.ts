@@ -6,11 +6,15 @@ import { getCollection } from "../../db";
 import { getSkip } from "../../common/utils";
 import { PostViewModel } from '../posts/posts-model';
 
+interface BlogsQueryOptions extends QueryOptions {
+	searchNameTerm: string;
+}
+
 export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
 	private _blogsCollection = getCollection<BlogViewModel>('blogs');
 	private _postsCollection = getCollection<PostViewModel>('posts');
 
-	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
+	public async getAll(options: Partial<BlogsQueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
 		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchNameTerm } = options;
 
 		const filter: Filter<BlogViewModel> = {};
