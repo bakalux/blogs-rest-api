@@ -129,7 +129,7 @@ describe('/blogs', () => {
 		await request(app).get(`/blogs/${ postedBlog1.id }`)
 	});
 
-	it('should not delete blog and return 404', async () => {
+	it('should not get blog and return 404', async () => {
 		await request(app).get('/blogs/asdfasdfasdf4352345')
 			.expect(404)
 	})
