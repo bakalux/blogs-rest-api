@@ -1,7 +1,7 @@
 import { Filter, Sort } from "mongodb";
 
 import { BlogDbModel, BlogViewModel } from './blogs-model';
-import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
+import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
 import { getCollection } from "../../db";
 import { getSkip } from "../../common/utils";
 import { PostDbModel, PostViewModel } from '../posts/posts-model';

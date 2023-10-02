@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { UsersQueryRepository } from './users-query-repository';
 import { UsersService } from '../../domain/users-service';
-import { SortDirection } from '../../common/iquery-repository';
+import { SortDirection } from '../../common/query-options';
 
 export class UsersController {
 	protected _queryRepository: UsersQueryRepository;

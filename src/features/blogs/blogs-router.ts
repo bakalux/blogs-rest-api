@@ -6,12 +6,12 @@ import { BlogsController } from './blogs-controller';
 import { BlogsService } from "../../domain/blogs-service";
 import { BlogsQueryRepository } from "./blogs-query-repository";
 import { PostsService } from '../../domain/posts-service';
-import { descriptionValidation, nameValidation, urlValidation } from '../../common/validation/blogs-validation';
+import { descriptionValidation, nameValidation, urlValidation } from './blogs-validation';
 import {
 	contentValidation,
 	shortDescriptionValidation,
 	titleValidation
-} from '../../common/validation/posts-validation';
+} from '../posts/posts-validation';
 
 const blogsQueryRepository = new BlogsQueryRepository();
 const blogsService = new BlogsService();

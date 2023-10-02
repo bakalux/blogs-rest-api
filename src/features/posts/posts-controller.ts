@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { PostsQueryRepository } from './posts-query-repository';
 import { PostsService } from '../../domain/posts-service';
-import { SortDirection } from '../../common/iquery-repository';
+import { SortDirection } from '../../common/query-options';
 
 export class PostsController {
 	protected _queryRepository: PostsQueryRepository;

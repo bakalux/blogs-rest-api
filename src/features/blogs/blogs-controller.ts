@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { BlogsService } from '../../domain/blogs-service';
 import { BlogsQueryRepository } from './blogs-query-repository';
 import { PostsService } from '../../domain/posts-service';
-import { SortDirection } from '../../common/iquery-repository';
+import { SortDirection } from '../../common/query-options';
 
 export class BlogsController {
 	protected _queryRepository: BlogsQueryRepository;

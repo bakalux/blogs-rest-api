@@ -10,7 +10,7 @@ import {
 	contentValidation,
 	shortDescriptionValidation,
 	titleValidation
-} from '../../common/validation/posts-validation';
+} from './posts-validation';
 
 const postsQueryRepository = new PostsQueryRepository();
 const postsService = new PostsService();
