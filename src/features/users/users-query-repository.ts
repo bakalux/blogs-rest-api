@@ -66,4 +66,16 @@ export class UsersQueryRepository {
 
 		return user;
 	}
+
+	public async getAuthData(loginOrEmail: string): Promise<UserDbModel | null> {
+		const user = await this._collection.findOne({
+			$or: [{ email: loginOrEmail }, { login: loginOrEmail }]
+		}, { projection: { _id: 0 } });
+
+		if (!user) {
+			return null;
+		}
+
+		return user;
+	}
 }
