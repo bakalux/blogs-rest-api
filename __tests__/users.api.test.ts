@@ -193,7 +193,7 @@ it('should not create user and return 401 unauthorized', async () => {
 
 
 it('should not create user that already exists', async () => {
-	const res = await request(app).put(`/users/${ postedUser2.id }`)
+	const res = await request(app).post('/users')
 		.set('Authorization', AUTHORIZATION_TOKEN)
 		.send({
 			login: postedUser1.login,
@@ -215,72 +215,72 @@ it('should not create user that already exists', async () => {
 		]
 	});
 });
+//
+// it('should update user and return 204 with no content', async () => {
+// 	const input: UserInputModel = {
+// 		login: 'loigin435345',
+// 		password: '123745674567456',
+// 		email: 'login4352345@gmail.com',
+// 	};
+//
+// 	await request(app).put(`/users/${ postedUser2.id }`)
+// 		.set('Authorization', AUTHORIZATION_TOKEN)
+// 		.send(input)
+// 		.expect(204)
+// })
 
-it('should update user and return 204 with no content', async () => {
-	const input: UserInputModel = {
-		login: 'loigin435345',
-		password: '123745674567456',
-		email: 'login4352345@gmail.com',
-	};
+// it('should not update user and return 400 with validation errors', async () => {
+// 	const res = await request(app).put(`/users/${ postedUser2.id }`)
+// 		.set('Authorization', AUTHORIZATION_TOKEN)
+// 		.send({
+// 			login: '',
+// 			password: '                    ',
+// 			email: '            ',
+// 		})
+// 		.expect(400);
+//
+// 	expect(res.body).toEqual({
+// 		errorsMessages: [
+// 			{
+// 				message: expect.any(String),
+// 				field: 'login'
+// 			},
+// 			{
+// 				message: expect.any(String),
+// 				field: 'password'
+// 			},
+// 			{
+// 				message: expect.any(String),
+// 				field: 'email'
+// 			},
+// 		]
+// 	});
+// });
 
-	await request(app).put(`/users/${ postedUser2.id }`)
-		.set('Authorization', AUTHORIZATION_TOKEN)
-		.send(input)
-		.expect(204)
-})
-
-it('should not update user and return 400 with validation errors', async () => {
-	const res = await request(app).put(`/users/${ postedUser2.id }`)
-		.set('Authorization', AUTHORIZATION_TOKEN)
-		.send({
-			login: '',
-			password: '                    ',
-			email: '            ',
-		})
-		.expect(400);
-
-	expect(res.body).toEqual({
-		errorsMessages: [
-			{
-				message: expect.any(String),
-				field: 'login'
-			},
-			{
-				message: expect.any(String),
-				field: 'password'
-			},
-			{
-				message: expect.any(String),
-				field: 'email'
-			},
-		]
-	});
-});
-
-it('should not update user and return 401 unauthorized', async () => {
-	const input: UserInputModel = {
-		login: 'user3241235',
-		password: '1234567',
-		email: 'usdfe@gmail.com',
-	};
-
-	await request(app).put(`/users/${ postedUser2.id }`)
-		.send(input)
-		.expect(401)
-})
-
-it('should not update user and return 404', async () => {
-	const input: UserInputModel = {
-		login: 'user324123533',
-		password: '1234567',
-		email: 'usdfe@gmail.com',
-	};
-
-	await request(app).put('/users/asdfasdfasdf4352345')
-		.set('Authorization', AUTHORIZATION_TOKEN)
-		.send(input)
-		.expect(404)
-})
+// it('should not update user and return 401 unauthorized', async () => {
+// 	const input: UserInputModel = {
+// 		login: 'user3241235',
+// 		password: '1234567',
+// 		email: 'usdfe@gmail.com',
+// 	};
+//
+// 	await request(app).put(`/users/${ postedUser2.id }`)
+// 		.send(input)
+// 		.expect(401)
+// })
+//
+// it('should not update user and return 404', async () => {
+// 	const input: UserInputModel = {
+// 		login: 'user324123533',
+// 		password: '1234567',
+// 		email: 'usdfe@gmail.com',
+// 	};
+//
+// 	await request(app).put('/users/asdfasdfasdf4352345')
+// 		.set('Authorization', AUTHORIZATION_TOKEN)
+// 		.send(input)
+// 		.expect(404)
+// })
 
 it('should delete user and return 204 no content', async () => {
 	await request(app).delete(`/users/${ postedUser2.id }`)

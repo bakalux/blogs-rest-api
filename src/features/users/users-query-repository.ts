@@ -46,4 +46,24 @@ export class UsersQueryRepository {
 			items,
 		}
 	}
+
+	public async getByLogin(login: string): Promise<UserViewModel | null> {
+		const user = await this._collection.findOne({ login },{ projection: { _id: 0, password: 0  }});
+
+		if (!user) {
+			return null;
+		}
+
+		return user;
+	}
+
+	public async getByEmail(email: string): Promise<UserViewModel | null> {
+		const user = await this._collection.findOne({ email }, { projection: { _id: 0, password: 0 } });
+
+		if (!user) {
+			return null;
+		}
+
+		return user;
+	}
 }
