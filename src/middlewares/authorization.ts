@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 export function checkAuthorization(req: Request, res: Response, next: NextFunction): void {
-	if (req.method === 'GET') {
+	if (req.method === 'GET' && req.originalUrl !== '/users') {
 		next();
 		return;
 	}

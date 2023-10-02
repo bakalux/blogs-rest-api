@@ -1,24 +1,19 @@
-import { BlogInputModel, BlogViewModel } from './blogs-model';
-import { IRepository } from '../../common/irepository';
+import { BlogDbModel, BlogDbUpdateModel, BlogDbViewModel } from './blogs-model';
 import { getCollection } from "../../db";
 
-export class BlogsRepository implements  IRepository<BlogViewModel, BlogInputModel>{
-	private _collection = getCollection<BlogViewModel>('blogs');
+export class BlogsRepository {
+	private _collection = getCollection<BlogDbModel>('blogs');
 
-	public async create(data: BlogViewModel): Promise<BlogViewModel> {
+	public async create(data: BlogDbModel): Promise<BlogDbViewModel> {
 		await this._collection.insertOne({ ...data });
 
 		return data;
 	}
 
-	public async updateById(id: string, data: BlogInputModel): Promise<BlogViewModel | null> {
-		const updating = {
-			...data,
-			id
-		}
+	public async updateById(id: string, data: BlogDbUpdateModel): Promise<BlogDbViewModel | null> {
 		const result = await this._collection.updateOne(
 			{ id },
-			{ $set: updating },
+			{ $set: data },
 		);
 
 		if (result.matchedCount === 0) {

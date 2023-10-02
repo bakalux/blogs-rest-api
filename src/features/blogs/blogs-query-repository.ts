@@ -1,16 +1,20 @@
 import { Filter, Sort } from "mongodb";
 
-import { BlogViewModel } from './blogs-model';
-import { IQueryRepository, ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
+import { BlogDbModel, BlogViewModel } from './blogs-model';
+import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
 import { getCollection } from "../../db";
 import { getSkip } from "../../common/utils";
-import { PostViewModel } from '../posts/posts-model';
+import { PostDbModel, PostViewModel } from '../posts/posts-model';
 
-export class BlogsQueryRepository implements IQueryRepository<BlogViewModel> {
-	private _blogsCollection = getCollection<BlogViewModel>('blogs');
-	private _postsCollection = getCollection<PostViewModel>('posts');
+interface BlogsQueryOptions extends QueryOptions {
+	searchNameTerm: string;
+}
 
-	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
+export class BlogsQueryRepository {
+	private _blogsCollection = getCollection<BlogDbModel>('blogs');
+	private _postsCollection = getCollection<PostDbModel>('posts');
+
+	public async getAll(options: Partial<BlogsQueryOptions>): Promise<ItemsQueryView<BlogViewModel>> {
 		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchNameTerm } = options;
 
 		const filter: Filter<BlogViewModel> = {};

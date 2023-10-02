@@ -1,0 +1,49 @@
+import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
+import { getCollection } from '../../db';
+import { UserDbModel, UserViewModel } from './users-model';
+import { Filter, Sort } from 'mongodb';
+import { getSkip } from '../../common/utils';
+
+interface UsersQueryOptions extends QueryOptions {
+	searchLoginTerm: string;
+	searchEmailTerm: string;
+}
+
+export class UsersQueryRepository {
+	private _collection = getCollection<UserDbModel>('users');
+
+	public async getAll(options: Partial<UsersQueryOptions>): Promise<ItemsQueryView<UserViewModel>> {
+		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchLoginTerm, searchEmailTerm } = options;
+
+		const filter: Filter<UserDbModel> = {};
+
+		if (searchLoginTerm) {
+			filter.login = { $regex: searchLoginTerm, $options: 'i' };
+		}
+
+		if (searchEmailTerm) {
+			filter.email = { $regex: searchEmailTerm, $options: 'i' };
+		}
+
+		const sorting: Sort = {}
+		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
+
+		const totalCount = await this._collection.countDocuments(filter);
+		const pagesCount = Math.ceil(totalCount / pageSize);
+
+		const items = await this._collection
+			.find(filter, { projection: { _id: 0, password: 0 } })
+			.sort(sorting)
+			.skip(getSkip(pageNumber, pageSize))
+			.limit(pageSize)
+			.toArray();
+
+		return {
+			totalCount,
+			pageSize,
+			page: pageNumber,
+			pagesCount,
+			items,
+		}
+	}
+}

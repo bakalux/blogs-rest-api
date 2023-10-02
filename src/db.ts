@@ -15,8 +15,9 @@ export async function runDb(): Promise<void> {
     }
 }
 
-export function getCollection<TViewModel extends Document>(name: string): Collection<TViewModel> {
-    return client.db().collection<TViewModel>(name);
+// TODO: change TViewModel to TDBModel
+export function getCollection<TDbModel extends Document>(name: string): Collection<TDbModel> {
+    return client.db().collection<TDbModel>(name);
 }
 
 export function closeDbConnection(): Promise<void> {

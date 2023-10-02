@@ -1,12 +1,12 @@
 import { Sort } from "mongodb";
 
-import { PostViewModel } from './posts-model';
-import { IQueryRepository, ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
+import { PostDbModel, PostViewModel } from './posts-model';
+import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
 import { getCollection } from "../../db";
 import { getSkip } from "../../common/utils";
 
-export class PostsQueryRepository implements  IQueryRepository<PostViewModel>{
-	private _collection = getCollection<PostViewModel>('posts');
+export class PostsQueryRepository {
+	private _collection = getCollection<PostDbModel>('posts');
 
 	public async getAll(options: Partial<QueryOptions>): Promise<ItemsQueryView<PostViewModel>> {
 		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc } = options;
@@ -18,7 +18,7 @@ export class PostsQueryRepository implements  IQueryRepository<PostViewModel>{
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items =  await this._collection
-			.find({}, { projection: {_id: 0 } })
+			.find({}, { projection: { _id: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)
