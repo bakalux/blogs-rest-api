@@ -12,6 +12,13 @@ export class AuthController {
 	}
 
 	public login = async (req: Request, res: Response): Promise<void> => {
-		res.status(201).send();
+		const isAuth = await this._service.checkCredentials(req.body);
+
+		if (isAuth) {
+			res.status(204).send();
+			return;
+		}
+
+		res.status(401).send();
 	}
 }
