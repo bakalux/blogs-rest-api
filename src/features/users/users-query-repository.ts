@@ -13,16 +13,28 @@ export class UsersQueryRepository {
 	private _collection = getCollection<UserDbModel>('users');
 
 	public async getAll(options: Partial<UsersQueryOptions>): Promise<ItemsQueryView<UserViewModel>> {
-		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchLoginTerm, searchEmailTerm } = options;
+		const {
+			pageNumber = 1,
+			pageSize = 10,
+			sortBy = 'createdAt',
+			sortDirection = SortDirection.Desc,
+			searchLoginTerm,
+			searchEmailTerm
+		} = options;
 
 		const filter: Filter<UserDbModel> = {};
+		const orConditions = [];
 
 		if (searchLoginTerm) {
-			filter.login = { $regex: searchLoginTerm, $options: 'i' };
+			orConditions.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
 		}
 
 		if (searchEmailTerm) {
-			filter.email = { $regex: searchEmailTerm, $options: 'i' };
+			orConditions.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
+		}
+
+		if (orConditions.length) {
+			filter.$or = orConditions;
 		}
 
 		const sorting: Sort = {}
@@ -48,7 +60,7 @@ export class UsersQueryRepository {
 	}
 
 	public async getByLogin(login: string): Promise<UserViewModel | null> {
-		const user = await this._collection.findOne({ login },{ projection: { _id: 0, password: 0  }});
+		const user = await this._collection.findOne({ login }, { projection: { _id: 0, password: 0 } });
 
 		if (!user) {
 			return null;

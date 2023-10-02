@@ -66,29 +66,16 @@ describe('/users', () => {
 		});
 	});
 
-	it('should correctly return search items by searchLoginTerm', async () => {
-		const res = await request(app).get('/users/?searchLoginTerm=user1')
+	it('should correctly return search items by searchLoginTerm and searchEmailTerm', async () => {
+		const res = await request(app).get('/users/?searchLoginTerm=user1&searchEmailTerm=yandex')
 			.expect(200);
 
 		expect(res.body).toEqual({
-			totalCount: 1,
+			totalCount: 2,
 			pagesCount: 1,
 			page: 1,
 			pageSize: 10,
-			items: [postedUser1]
-		});
-	});
-
-	it('should correctly return search items by searchEmailTerm', async () => {
-		const res = await request(app).get('/users/?searchEmailTerm=yandex')
-			.expect(200);
-
-		expect(res.body).toEqual({
-			totalCount: 1,
-			pagesCount: 1,
-			page: 1,
-			pageSize: 10,
-			items: [postedUser2]
+			items: [postedUser2, postedUser1]
 		});
 	});
 
