@@ -1,16 +1,15 @@
-import { PostInputModel, PostViewModel } from './posts-model';
-import { IRepository } from '../../common/irepository';
+import { PostDbModel, PostDbUpdateModel, PostDbViewModel } from './posts-model';
 import { getCollection } from "../../db";
 
-export class PostsRepository implements  IRepository<PostViewModel, PostInputModel>{
-	private _collection = getCollection<PostViewModel>('posts');
+export class PostsRepository {
+	private _collection = getCollection<PostDbModel>('posts');
 
-	public async create(data: PostViewModel): Promise<PostViewModel> {
+	public async create(data: PostDbModel): Promise<PostDbViewModel> {
 		await this._collection.insertOne({ ...data });
 		return data;
 	}
 
-	public async updateById(id: string, data: PostInputModel): Promise<PostViewModel | null> {
+	public async updateById(id: string, data: PostDbUpdateModel): Promise<PostDbViewModel | null> {
 		const updating = {
 			...data,
 			id,

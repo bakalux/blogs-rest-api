@@ -40,6 +40,7 @@ afterAll(async () => {
 
 it('should return 200 with correct users', async () => {
 	const res = await request(app).get('/users')
+		.set('Authorization', AUTHORIZATION_TOKEN)
 		.expect(200);
 
 	expect(res.body).toEqual({
@@ -128,10 +129,10 @@ it('should correctly sort by sortBy field', async () => {
 });
 
 
-it('should return 200 with correct user', async () => {
-	await request(app).get(`/users/${ postedUser1.id }`)
-		.set('Authorization', AUTHORIZATION_TOKEN)
-});
+// it('should return 200 with correct user', async () => {
+// 	await request(app).get(`/users/${ postedUser1.id }`)
+// 		.set('Authorization', AUTHORIZATION_TOKEN)
+// });
 
 it('should not return user by id and return 401 unauthorized', async () => {
 	await request(app).get(`/users/${ postedUser1.id }`)

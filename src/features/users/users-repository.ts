@@ -1,18 +1,29 @@
-import { IRepository } from '../../common/irepository';
 import { getCollection } from '../../db';
-import { UserInputModel, UserViewModel } from './users-model';
+import { UserDbModel, UserDbUpdateModel, UserDbViewModel } from './users-model';
 
-// TODO: use repository class for all repositories
-export class UsersRepository implements  IRepository<UserViewModel, UserInputModel>{
-	private _collection = getCollection<UserViewModel>('users');
+export class UsersRepository {
+	private _collection = getCollection<UserDbModel>('users');
 
-	public async create(data: UserViewModel): Promise<UserViewModel> {
+	public async create(data: UserDbModel): Promise<UserDbViewModel> {
 		await this._collection.insertOne({ ...data });
 
-		return data;
+		const created = await this._collection.findOne({
+			id: data.id,
+		}, {
+			projection: {
+				_id: 0,
+				password: 0
+			}
+		});
+
+		if (created === null) {
+			throw new Error("created user not found");
+		}
+
+		return created;
 	}
 
-	public async updateById(id: string, data: UserInputModel): Promise<UserViewModel | null> {
+	public async updateById(id: string, data: UserDbUpdateModel): Promise<UserDbViewModel | null> {
 		const updating = {
 			...data,
 			id

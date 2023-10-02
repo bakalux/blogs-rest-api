@@ -1,8 +1,7 @@
-import { IQueryRepository, ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
+import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/iquery-repository';
 import { getCollection } from '../../db';
-import { UserViewModel } from './users-model';
+import { UserDbModel, UserViewModel } from './users-model';
 import { Filter, Sort } from 'mongodb';
-import { BlogViewModel } from '../blogs/blogs-model';
 import { getSkip } from '../../common/utils';
 
 interface UsersQueryOptions extends QueryOptions {
@@ -10,13 +9,13 @@ interface UsersQueryOptions extends QueryOptions {
 	searchEmailTerm: string;
 }
 
-export class UsersQueryRepository implements  IQueryRepository<UserViewModel> {
-	private _collection = getCollection<UserViewModel>('users');
+export class UsersQueryRepository {
+	private _collection = getCollection<UserDbModel>('users');
 
 	public async getAll(options: Partial<UsersQueryOptions>): Promise<ItemsQueryView<UserViewModel>> {
 		const { pageNumber = 1, pageSize = 10, sortBy = 'createdAt', sortDirection = SortDirection.Desc, searchLoginTerm, searchEmailTerm } = options;
 
-		const filter: Filter<BlogViewModel> = {};
+		const filter: Filter<UserDbModel> = {};
 
 		if (searchLoginTerm) {
 			filter.login = { $regex: searchLoginTerm, $options: 'i' };
@@ -33,7 +32,7 @@ export class UsersQueryRepository implements  IQueryRepository<UserViewModel> {
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items = await this._collection
-			.find(filter, { projection: { _id: 0 } })
+			.find(filter, { projection: { _id: 0, password: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)
@@ -46,9 +45,5 @@ export class UsersQueryRepository implements  IQueryRepository<UserViewModel> {
 			pagesCount,
 			items,
 		}
-	}
-
-	public async getById(id: string): Promise<UserViewModel | null> {
-		throw new Error("not implemented");
 	}
 }

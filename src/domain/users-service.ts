@@ -1,5 +1,5 @@
 import { IService } from './iservice';
-import { UserInputModel, UserViewModel } from '../features/users/users-model';
+import { UserDbModel, UserInputModel, UserViewModel } from '../features/users/users-model';
 import { UsersRepository } from '../features/users/users-repository';
 
 
@@ -8,9 +8,10 @@ export class UsersService implements IService<UserViewModel, UserInputModel>{
 
     public async create(data: UserInputModel): Promise<UserViewModel> {
         const date = new Date();
-        const user: UserViewModel = {
+        const user: UserDbModel = {
 			login: data.login,
 			email: data.email,
+            password: data.password,
             id: Math.floor(Math.random() * 1000).toString(),
             createdAt: date.toISOString(),
         };

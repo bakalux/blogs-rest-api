@@ -17,8 +17,8 @@ usersRouter.use(checkAuthorization);
 usersRouter.get('/', usersController.getAll);
 
 usersRouter.post('/',
-	emailValidation,
 	loginValidation,
+	emailValidation,
 	passwordValidation,
 	inputValidation,
 	usersController.create,
