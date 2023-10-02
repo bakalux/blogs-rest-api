@@ -16,8 +16,8 @@ export const loginValidation = body('login').isString().notEmpty().isLength({
 	return Promise.resolve(true);
 });
 
-export const passwordValidation = body('password').isString().notEmpty().isLength({ min: 6, max: 20 })
-export const emailValidation = body('email').isString().notEmpty().isEmail().custom(async (value) => {
+export const passwordValidation = body('password').isString().trim().notEmpty().isLength({ min: 6, max: 20 })
+export const emailValidation = body('email').isString().trim().notEmpty().isEmail().custom(async (value) => {
 	const user = await usersQueryRepository.getByEmail(value);
 
 	if (user) {
