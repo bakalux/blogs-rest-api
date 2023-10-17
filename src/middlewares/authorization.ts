@@ -31,17 +31,18 @@ export function basicAuthorization(req: Request, res: Response, next: NextFuncti
 }
 export async function bearerAuthorization(req: Request, res: Response, next: NextFunction): Promise<void> {
 	if (!req.headers.authorization) {
-		res.send(401);
+		res.status(401).send();
 		return;
 	}
 
-	const [, token] = req.headers.authorization.split(' ');
+	const [, encoded] = req.headers.authorization.split(' ');
+	const token = Buffer.from(encoded, 'base64').toString('ascii');
 	const userId = await jwtService.getUserIdByToken(token);
 
 	if (userId) {
 		const user = await usersQueryRepository.getById(userId);
 		if (!user) {
-			res.send(401);
+			res.status(401).send();
 			return;
 		}
 
@@ -50,5 +51,5 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		return;
 	}
 
-	res.send(401);
+	res.status(401).send();
 }

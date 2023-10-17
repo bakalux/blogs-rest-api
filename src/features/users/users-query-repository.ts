@@ -1,6 +1,6 @@
 import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
 import { getCollection } from '../../db';
-import { UserDbModel, UserViewModel } from './users-model';
+import {UserDbModel, UserViewModel} from './users-model';
 import { Filter, Sort } from 'mongodb';
 import { getSkip } from '../../common/utils';
 
