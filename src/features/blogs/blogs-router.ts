@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { checkAuthorization } from '../../middlewares/authorization';
+import { basicAuthorization } from '../../middlewares/authorization';
 import { inputValidation } from '../../middlewares/input-validation';
 import { BlogsController } from './blogs-controller';
 import { BlogsService } from "../../domain/blogs-service";
@@ -19,7 +19,7 @@ const postsService = new PostsService();
 const blogsController = new BlogsController(blogsService, blogsQueryRepository, postsService);
 const blogsRouter = Router()
 
-blogsRouter.use(checkAuthorization);
+blogsRouter.use(basicAuthorization);
 
 blogsRouter.get('/', blogsController.getAll);
 

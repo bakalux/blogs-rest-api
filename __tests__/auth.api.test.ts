@@ -14,6 +14,8 @@ describe('/auth', () => {
 		email: 'user1@gmail.com',
 	}
 
+	let accessToken: string = 'placeholder';
+
 	beforeAll(async () => {
 		await runDb();
 		await request(app).delete('/testing/all-data')
@@ -27,20 +29,32 @@ describe('/auth', () => {
 		server.close();
 	});
 
-	it('should auth user by login and return 204', async () => {
-		await request(app).post('/auth/login')
+	it('should auth user by login and return 200 with accessToken', async () => {
+		const res = await request(app).post('/auth/login')
 			.send({
 				loginOrEmail: postedUser1.login,
 				password: input1.password,
-			}).expect(204)
+			}).expect(200);
+
+		expect(res.body).toEqual({
+			accessToken: expect.any(String),
+		});
+
+		accessToken = res.body.accessToken;
 	});
 
-	it('should auth user by email and return 204', async () => {
-		await request(app).post('/auth/login')
+	it('should auth user by email and return 200 with access token', async () => {
+		const res = await request(app).post('/auth/login')
 			.send({
 				loginOrEmail: postedUser1.email,
 				password: input1.password,
-			}).expect(204)
+			}).expect(200)
+
+		expect(res.body).toEqual({
+			accessToken: expect.any(String),
+		});
+
+		accessToken = res.body.accessToken;
 	});
 
 	it('should not auth user and return validation errors', async () => {
@@ -86,6 +100,26 @@ describe('/auth', () => {
 				loginOrEmail: postedUser1.login,
 				password: '123456',
 			})
+			.expect(401);
+	});
+
+	it('should return user data on auth me with correct access token', async () => {
+		const authToken = 'Bearer ' + Buffer.from(accessToken).toString('base64');
+
+		const res = await request(app).get('/auth/me')
+			.set('Authorization', authToken)
+			.expect(200);
+
+		expect(res.body).toEqual({
+			email: postedUser1.email,
+			login: postedUser1.login,
+			userId: postedUser1.id,
+		});
+	});
+
+	it('should not return user data on auth/me with wrong access token and return 401 ', async () => {
+		await request(app).get('/auth/me')
+			.set('Authorization', 'Bearer blabalblalb')
 			.expect(401);
 	});
 })

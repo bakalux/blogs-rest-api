@@ -37,18 +37,18 @@ export class UsersService implements IService<UserViewModel, UserInputModel> {
 		await this._usersRepository.deleteAll();
 	}
 
-	public async checkCredentials(credentials: LoginInputModel): Promise<boolean> {
+	public async checkCredentials(credentials: LoginInputModel): Promise<string | null> {
 		const { loginOrEmail, password } = credentials;
 
 		const user = await this._usersQueryRepository.getAuthData(loginOrEmail);
 
 		if (!user) {
-			return false;
+			return null;
 		}
 
 		const arePasswordsEqual = await this._comparePasswords(password, user.password);
 
-		return arePasswordsEqual;
+		return arePasswordsEqual ? user.id : null;
 	}
 
 	private async _generatePasswordHash(password: string): Promise<string> {

@@ -1,8 +1,6 @@
-import dotenv from 'dotenv'
 import { Collection, MongoClient, Document } from 'mongodb';
-dotenv.config()
+import {mongoURI} from "./settings";
 
-const mongoURI = process.env.MONGO_URI as string;
 export const client = new MongoClient(mongoURI);
 
 export async function runDb(): Promise<void> {
