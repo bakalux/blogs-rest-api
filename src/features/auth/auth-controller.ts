@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 
 import { UsersService } from '../../domain/users-service';
 import { jwtService } from '../../application/jwt-service';
-import {UsersQueryRepository} from "../users/users-query-repository";
+import { UsersQueryRepository } from "../users/users-query-repository";
+import { MeViewModel } from "./auth-model";
 
 export class AuthController {
 	protected _service: UsersService;
@@ -43,10 +44,12 @@ export class AuthController {
 			return
 		}
 
-		res.status(200).send({
+		const data: MeViewModel = {
 			userId: user.id,
 			login: user.login,
 			email: user.email,
-		});
+		};
+
+		res.status(200).send(data);
 	}
 }
