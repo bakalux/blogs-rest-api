@@ -3,23 +3,27 @@ import { Request, Response } from 'express';
 import { PostsQueryRepository } from './posts-query-repository';
 import { PostsService } from '../../domain/posts-service';
 import { SortDirection } from '../../common/query-options';
+import {CommentsService} from "../../domain/comments-service";
 
 export class PostsController {
-	protected _queryRepository: PostsQueryRepository;
-	protected _service: PostsService;
+	private _postsQueryRepository: PostsQueryRepository;
+	private _postsService: PostsService;
+	private _commentsService: CommentsService;
 
 	public constructor(
 		service: PostsService,
 		queryRepository: PostsQueryRepository,
+		commentsSerivce: CommentsService
 	) {
-		this._queryRepository = queryRepository;
-		this._service = service
+		this._postsQueryRepository = queryRepository;
+		this._postsService = service
+		this._commentsService = commentsSerivce
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
 		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
 
-		const data = await this._queryRepository.getAll({
+		const data = await this._postsQueryRepository.getAll({
 			sortDirection: sortDirection as SortDirection,
 			sortBy,
 			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
@@ -30,7 +34,7 @@ export class PostsController {
 	}
 
 	public getOne = async (req: Request, res: Response): Promise<void> => {
-		const item = await this._queryRepository.getById(req.params.id);
+		const item = await this._postsQueryRepository.getById(req.params.id);
 
 		if (item === null) {
 			res.status(404).send();
@@ -42,14 +46,14 @@ export class PostsController {
 
 	public create = async (req: Request, res: Response): Promise<void> => {
 		const data = req.body;
-		const item = await this._service.create(data);
+		const item = await this._postsService.create(data);
 		res.status(201).send(item);
 	}
 
 	public updateOne = async (req: Request, res: Response): Promise<void> => {
 		const data = req.body;
 
-		const updated = await this._service.updateById(req.params.id, data);
+		const updated = await this._postsService.updateById(req.params.id, data);
 
 		if (!updated) {
 			res.status(404).send();
@@ -60,7 +64,7 @@ export class PostsController {
 	}
 
 	public deleteOne = async (req: Request, res: Response): Promise<void> => {
-		const isDeleted = await this._service.deleteById(req.params.id);
+		const isDeleted = await this._postsService.deleteById(req.params.id);
 
 		if (!isDeleted) {
 			res.status(404).send();
@@ -68,5 +72,37 @@ export class PostsController {
 		}
 
 		res.status(204).send();
+	}
+
+	public createComment = async (req: Request, res: Response): Promise<void> => {
+		const post =  await this._postsQueryRepository.getById(req.params.id);
+
+		if (!post) {
+			res.status(404).send();
+		}
+
+		const data = req.body;
+		const item = await this._commentsService.create(data);
+		res.status(201).send(item);
+	}
+
+
+	public getComments = async (req: Request, res: Response): Promise<void> => {
+		const post = await this._postsQueryRepository.getById(req.params.id);
+
+		if (!post) {
+			res.status(404).send();
+		}
+
+		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
+
+		const data = await this._postsQueryRepository.getAll({
+			sortDirection: sortDirection as SortDirection,
+			sortBy,
+			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
+			pageSize: typeof pageSize === 'string' ? Number(pageSize) : 10,
+		});
+
+		res.status(200).send(data);
 	}
 }
