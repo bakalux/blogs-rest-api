@@ -15,7 +15,7 @@ export function basicAuthorization(req: Request, res: Response, next: NextFuncti
 		return;
 	}
 
-	const encoded = req.headers.authorization.replace('Basic ', '');
+	const [, encoded] = req.headers.authorization.split(' ');
 	const buff = Buffer.from(encoded, 'base64');
 
 	const token = buff.toString('ascii');
@@ -36,7 +36,9 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 	}
 
 	if (!req.headers.authorization) {
-		res.status(401).send();
+		res.status(401).send({
+			error: 'no data in authorization header',
+		});
 		return;
 	}
 
@@ -47,7 +49,9 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 	if (userId) {
 		const user = await usersQueryRepository.getById(userId);
 		if (!user) {
-			res.status(401).send();
+			res.status(401).send({
+				error: `did not find user by userId ${userId} with token ${token}. Header is ${req.headers.authorization}`
+			});
 			return;
 		}
 
