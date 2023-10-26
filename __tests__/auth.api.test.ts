@@ -25,8 +25,6 @@ describe('/auth', () => {
 	})
 
 	afterAll(async () => {
-		await request(app).delete('/testing/all-data')
-			.expect(204)
 		await closeDbConnection();
 		server.close();
 	});
