@@ -255,6 +255,9 @@ describe('/posts', () => {
 		await request(app).delete(`/posts/${ postedPost2.id }`)
 			.set('Authorization', AUTHORIZATION_TOKEN)
 			.expect(204)
+
+		await request(app).get(`/posts/${ postedPost2.id }`)
+			.expect(404)
 	})
 
 	it('should not delete post and return 404', async () => {
