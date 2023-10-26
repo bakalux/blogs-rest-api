@@ -52,6 +52,7 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		}
 
 		req.userId = userId;
+		console.log('userId is', req.userId);
 		next();
 		return;
 	}

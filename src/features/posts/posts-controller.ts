@@ -4,20 +4,24 @@ import { PostsQueryRepository } from './posts-query-repository';
 import { PostsService } from '../../domain/posts-service';
 import { SortDirection } from '../../common/query-options';
 import {CommentsService} from "../../domain/comments-service";
+import {CommentsQueryRepository} from "../comments/comments-query-repository";
 
 export class PostsController {
 	private _postsQueryRepository: PostsQueryRepository;
 	private _postsService: PostsService;
 	private _commentsService: CommentsService;
+	private _commentsQueryRepository: CommentsQueryRepository;
 
 	public constructor(
 		service: PostsService,
 		queryRepository: PostsQueryRepository,
-		commentsSerivce: CommentsService
+		commentsService: CommentsService,
+		commentsQueryRepository: CommentsQueryRepository,
 	) {
 		this._postsQueryRepository = queryRepository;
 		this._postsService = service
-		this._commentsService = commentsSerivce
+		this._commentsService = commentsService
+		this._commentsQueryRepository = commentsQueryRepository;
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
@@ -79,10 +83,11 @@ export class PostsController {
 
 		if (!post) {
 			res.status(404).send();
+			return;
 		}
 
 		const data = req.body;
-		const item = await this._commentsService.create({...data, userId: req.userId });
+		const item = await this._commentsService.create({...data, userId: req.userId, postId: post.id });
 		res.status(201).send(item);
 	}
 
@@ -90,13 +95,14 @@ export class PostsController {
 	public getComments = async (req: Request, res: Response): Promise<void> => {
 		const post = await this._postsQueryRepository.getById(req.params.id);
 
-		if (!post) {
+		if (post === null) {
 			res.status(404).send();
+			return;
 		}
 
 		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
 
-		const data = await this._postsQueryRepository.getAll({
+		const data = await this._commentsQueryRepository.getAllByPostId(post.id,{
 			sortDirection: sortDirection as SortDirection,
 			sortBy,
 			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,

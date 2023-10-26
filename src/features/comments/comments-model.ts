@@ -20,6 +20,7 @@ export interface CommentDbUpdateModel {
 
 export interface CommentDbModel {
     id: string;
+	postId: string;
 	content: string;
 	commentatorInfo: CommentatorInfo;
 	createdAt: string;

@@ -15,11 +15,13 @@ import {
 	contentValidation as commentContentValidation,
 } from '../comments/comments-validation';
 import {CommentsService} from "../../domain/comments-service";
+import {CommentsQueryRepository} from "../comments/comments-query-repository";
 
 const postsQueryRepository = new PostsQueryRepository();
 const postsService = new PostsService();
-const commentsSerivce = new CommentsService();
-const postsController = new PostsController(postsService, postsQueryRepository, commentsSerivce);
+const commentsService = new CommentsService();
+const commentsQueryRepository = new CommentsQueryRepository();
+const postsController = new PostsController(postsService, postsQueryRepository, commentsService, commentsQueryRepository);
 const postsRouter = Router();
 
 
@@ -50,7 +52,7 @@ postsRouter.put('/:id',
 postsRouter.delete('/:id', basicAuthorization, postsController.deleteOne);
 
 postsRouter.post('/:id/comments',
-	// bearerAuthorization,
+	bearerAuthorization,
 	commentContentValidation,
 	inputValidation,
 	postsController.createComment

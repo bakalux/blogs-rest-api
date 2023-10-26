@@ -21,6 +21,7 @@ export class CommentsService {
 
 		const date = new Date();
 		const comment: CommentDbModel = {
+			postId: data.postId,
 			content: data.content,
 			id: Math.floor(Math.random() * 1000).toString(),
             commentatorInfo: {
@@ -30,11 +31,29 @@ export class CommentsService {
 			createdAt: date.toISOString(),
 		};
 
-		return this._commentsRepository.create(comment);
+		const created = await this._commentsRepository.create(comment);
+
+		return {
+			id: created.id,
+			content: created.content,
+			createdAt: created.createdAt,
+			commentatorInfo: created.commentatorInfo,
+		}
 	}
 
 	public async updateById(id: string, data: CommentInputModel): Promise<CommentViewModel | null> {
-		return await this._commentsRepository.updateById(id, data);
+		const updated = await this._commentsRepository.updateById(id, data);
+
+		if (updated === null) {
+			return null;
+		}
+
+		return {
+			id: updated.id,
+			content: updated.content,
+			createdAt: updated.createdAt,
+			commentatorInfo: updated.commentatorInfo,
+		}
 	}
 
 	public async deleteById(id: string): Promise<boolean> {

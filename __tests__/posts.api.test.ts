@@ -7,6 +7,8 @@ import { BlogInputModel, BlogViewModel } from "../src/features/blogs/blogs-model
 import { AUTHORIZATION_TOKEN } from "./consts";
 import { server } from "./server";
 import { runDb, closeDbConnection } from "../src/db";
+import {UserInputModel, UserViewModel} from "../src/features/users/users-model";
+import {usersTestManager} from "./users-test-manager";
 
 
 type UnknownPostInputModel = {
@@ -18,6 +20,8 @@ describe('/posts', () => {
 	let postedPost2: PostViewModel;
 	let validInputData: PostInputModel;
 	let bindingBlog: BlogViewModel;
+	let postedUser1: UserViewModel;
+	let accessToken = 'wrong token';
 	beforeAll(async () => {
 		await runDb();
 		await request(app).delete('/testing/all-data')
@@ -58,6 +62,26 @@ describe('/posts', () => {
 
 		const res2 = await postsTestManager.createPost(input2, 201, bindingBlog.name)
 		postedPost2 = res2.body;
+
+		const userInput1: UserInputModel = {
+			login: 'user1',
+			password: '123546367',
+			email: 'user1@gmail.com',
+		}
+		const userRes1 = await usersTestManager.createUser(userInput1, 201);
+		postedUser1 = userRes1.body;
+
+		const loginRes = await request(app).post('/auth/login')
+			.send({
+				loginOrEmail: postedUser1.login,
+				password: userInput1.password,
+			}).expect(200);
+
+		expect(loginRes.body).toEqual({
+			accessToken: expect.any(String),
+		});
+
+		accessToken = 'Bearer ' + Buffer.from(loginRes.body.accessToken).toString('base64');
 	})
 
 	afterAll(async () => {
@@ -251,6 +275,50 @@ describe('/posts', () => {
 			.expect(404)
 	})
 
+	it('should create comment for existing post', async () => {
+		const data = {
+			content: 'some random comment should be valid enough'
+		}
+		const res = await request(app).post(`/posts/${postedPost1.id}/comments`)
+			.set('Authorization', accessToken)
+			.send({
+				content: 'some random comment should be valid enough'
+			})
+			.expect(201)
+
+		expect(res.body).toEqual({
+			id: expect.any(String),
+			createdAt: expect.any(String),
+			content: data.content,
+			commentatorInfo: {
+				userId: postedUser1.id,
+				userLogin: postedUser1.login,
+			}
+		});
+	});
+
+	it('should return comments for existing post', async () => {
+		const res = await request(app).get(`/posts/${postedPost1.id}/comments`)
+			.expect(200)
+
+		expect(res.body).toEqual({
+				totalCount: 1,
+				pagesCount: 1,
+				page: 1,
+				pageSize: 10,
+				items: [{
+					id: expect.any(String),
+					createdAt: expect.any(String),
+					content: expect.any(String),
+					commentatorInfo: {
+						userId: postedUser1.id,
+						userLogin: postedUser1.login,
+					}
+				}]
+			}
+		);
+	})
+
 	it('should delete post and return 204 no content', async () => {
 		await request(app).delete(`/posts/${ postedPost2.id }`)
 			.set('Authorization', AUTHORIZATION_TOKEN)
@@ -269,5 +337,5 @@ describe('/posts', () => {
 	it('should delete all data and return 204', async () => {
 		await request(app).delete('/testing/all-data')
 			.expect(204, {})
-	})
+	});
 })

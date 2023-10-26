@@ -18,7 +18,10 @@ export class CommentsQueryRepository {
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items =  await this._collection
-			.find({}, { projection: { _id: 0 } })
+			.find({}, { projection: {
+				_id: 0,
+				postId: 0,
+			} })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)
@@ -34,7 +37,7 @@ export class CommentsQueryRepository {
 	}
 
 	public async getById(id: string): Promise<CommentViewModel | null> {
-		const comment = await this._collection.findOne({ id },{ projection: { _id: 0  }});
+		const comment = await this._collection.findOne({ id },{ projection: { _id: 0, postId: 0 }});
 
 		if (!comment) {
 			return null;
