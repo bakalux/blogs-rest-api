@@ -2,6 +2,7 @@ import { PostInputModel, PostViewModel } from "../features/posts/posts-model";
 import { IService } from "./iservice";
 import { PostsRepository } from "../features/posts/posts-repository";
 import { BlogsQueryRepository } from "../features/blogs/blogs-query-repository";
+import {CommentInputModel, CommentViewModel} from "../features/comments/comments-model";
 
 export class PostsService implements IService<PostViewModel, PostInputModel> {
 	private _postsRepository = new PostsRepository();

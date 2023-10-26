@@ -30,6 +30,11 @@ export function basicAuthorization(req: Request, res: Response, next: NextFuncti
 	next();
 }
 export async function bearerAuthorization(req: Request, res: Response, next: NextFunction): Promise<void> {
+	if (req.method === 'GET') {
+		next();
+		return;
+	}
+
 	if (!req.headers.authorization) {
 		res.status(401).send();
 		return;

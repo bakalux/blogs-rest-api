@@ -14,6 +14,10 @@ export interface CommentViewModel {
 	createdAt: string;
 }
 
+export interface CommentDbUpdateModel {
+	content: string;
+}
+
 export interface CommentDbModel {
     id: string;
 	content: string;

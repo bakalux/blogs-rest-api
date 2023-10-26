@@ -43,4 +43,7 @@ postsRouter.put('/:id',
 
 postsRouter.delete('/:id', postsController.deleteOne);
 
+postsRouter.post('/:id/comments', postsController.createComment);
+postsRouter.get('/:id/comments', postsController.getComments);
+
 export default postsRouter;

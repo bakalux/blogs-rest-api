@@ -5,21 +5,22 @@ import { PostsService } from '../../domain/posts-service';
 import { SortDirection } from '../../common/query-options';
 
 export class PostsController {
-	protected _queryRepository: PostsQueryRepository;
-	protected _service: PostsService;
+	private _postsQueryRepository: PostsQueryRepository;
+	private _commentsQueryRepository = null;
+	private _service: PostsService;
 
 	public constructor(
 		service: PostsService,
 		queryRepository: PostsQueryRepository,
 	) {
-		this._queryRepository = queryRepository;
+		this._postsQueryRepository = queryRepository;
 		this._service = service
 	}
 
 	public getAll = async (req: Request, res: Response): Promise<void> => {
 		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
 
-		const data = await this._queryRepository.getAll({
+		const data = await this._postsQueryRepository.getAll({
 			sortDirection: sortDirection as SortDirection,
 			sortBy,
 			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
@@ -30,7 +31,7 @@ export class PostsController {
 	}
 
 	public getOne = async (req: Request, res: Response): Promise<void> => {
-		const item = await this._queryRepository.getById(req.params.id);
+		const item = await this._postsQueryRepository.getById(req.params.id);
 
 		if (item === null) {
 			res.status(404).send();
@@ -68,5 +69,25 @@ export class PostsController {
 		}
 
 		res.status(204).send();
+	}
+
+	public createComment = async (req: Request, res: Response): Promise<void> => {
+		const data = req.body;
+		// const item = await this._service.createComment(data);
+		// res.status(201).send(item);
+	}
+
+
+	public getComments = async (req: Request, res: Response): Promise<void> => {
+		const { sortDirection, sortBy, pageNumber, pageSize } = req.query;
+
+		const data = await this._postsQueryRepository.getAll({
+			sortDirection: sortDirection as SortDirection,
+			sortBy,
+			pageNumber: typeof pageNumber === 'string' ? Number(pageNumber) : 1,
+			pageSize: typeof pageSize === 'string' ? Number(pageSize) : 10,
+		});
+
+		res.status(200).send(data);
 	}
 }
