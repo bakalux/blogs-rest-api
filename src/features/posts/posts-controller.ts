@@ -82,7 +82,7 @@ export class PostsController {
 		}
 
 		const data = req.body;
-		const item = await this._commentsService.create(data);
+		const item = await this._commentsService.create({...data, userId: req.userId });
 		res.status(201).send(item);
 	}
 
