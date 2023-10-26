@@ -49,7 +49,7 @@ postsRouter.put('/:id',
 postsRouter.delete('/:id', postsController.deleteOne);
 
 postsRouter.post('/:id/comments',
-	bearerAuthorization,
+	// bearerAuthorization,
 	commentContentValidation,
 	inputValidation,
 	postsController.createComment
