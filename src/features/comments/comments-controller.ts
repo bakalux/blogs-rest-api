@@ -26,6 +26,17 @@ export class CommentsController {
 	}
 
 	public updateOne = async (req: Request, res: Response): Promise<void> => {
+		const comment = await this._commentsQueryRepository.getById(req.params.id);
+
+		if (!comment) {
+			res.status(404).send();
+			return;
+		}
+
+		if (comment.commentatorInfo.userId !== req.userId) {
+			res.status(403).send();
+		}
+
 		const data = req.body;
 
 		const updated = await this._service.updateById(req.params.id, data);
@@ -39,6 +50,17 @@ export class CommentsController {
 	}
 
 	public deleteOne = async (req: Request, res: Response): Promise<void> => {
+		const comment = await this._commentsQueryRepository.getById(req.params.id);
+
+		if (!comment) {
+			res.status(404).send();
+			return;
+		}
+
+		if (comment.commentatorInfo.userId !== req.userId) {
+			res.status(403).send();
+		}
+
 		const isDeleted = await this._service.deleteById(req.params.id);
 
 		if (!isDeleted) {

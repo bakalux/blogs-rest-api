@@ -6,7 +6,6 @@ import { SortDirection } from '../../common/query-options';
 
 export class PostsController {
 	private _postsQueryRepository: PostsQueryRepository;
-	private _commentsQueryRepository = null;
 	private _service: PostsService;
 
 	public constructor(
