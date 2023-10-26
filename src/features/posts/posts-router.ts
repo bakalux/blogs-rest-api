@@ -22,11 +22,11 @@ const commentsSerivce = new CommentsService();
 const postsController = new PostsController(postsService, postsQueryRepository, commentsSerivce);
 const postsRouter = Router();
 
-postsRouter.use(basicAuthorization);
 
 postsRouter.get('/', postsController.getAll);
 
 postsRouter.post('/',
+	basicAuthorization,
 	titleValidation,
 	shortDescriptionValidation,
 	contentValidation,
@@ -38,6 +38,7 @@ postsRouter.post('/',
 postsRouter.get('/:id', postsController.getOne);
 
 postsRouter.put('/:id',
+	basicAuthorization,
 	titleValidation,
 	shortDescriptionValidation,
 	contentValidation,
@@ -46,7 +47,7 @@ postsRouter.put('/:id',
 	postsController.updateOne
 );
 
-postsRouter.delete('/:id', postsController.deleteOne);
+postsRouter.delete('/:id', basicAuthorization, postsController.deleteOne);
 
 postsRouter.post('/:id/comments',
 	// bearerAuthorization,
