@@ -13,7 +13,6 @@ export async function runDb(): Promise<void> {
     }
 }
 
-// TODO: change TViewModel to TDBModel
 export function getCollection<TDbModel extends Document>(name: string): Collection<TDbModel> {
     return client.db().collection<TDbModel>(name);
 }

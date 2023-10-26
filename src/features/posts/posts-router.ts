@@ -48,7 +48,12 @@ postsRouter.put('/:id',
 
 postsRouter.delete('/:id', postsController.deleteOne);
 
-postsRouter.post('/:id/comments', bearerAuthorization, commentContentValidation, postsController.createComment);
+postsRouter.post('/:id/comments',
+	bearerAuthorization,
+	commentContentValidation,
+	inputValidation,
+	postsController.createComment
+);
 postsRouter.get('/:id/comments', postsController.getComments);
 
 export default postsRouter;
