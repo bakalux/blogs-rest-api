@@ -35,6 +35,7 @@ export class CommentsController {
 
 		if (comment.commentatorInfo.userId !== req.userId) {
 			res.status(403).send();
+			return
 		}
 
 		const data = req.body;

@@ -56,19 +56,20 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 
 	const userId = await jwtService.getUserIdByToken(token);
 
-	if (userId) {
-		const user = await usersQueryRepository.getById(userId);
-		if (!user) {
-			res.status(401).send({
-				error: `did not find user by userId ${userId} with token ${token}. Header is ${req.headers.authorization}`
-			});
-			return;
-		}
-
-		req.userId = userId;
-		next();
+	if (!userId) {
+		res.status(401).send();
 		return;
 	}
 
-	res.status(401).send();
+	const user = await usersQueryRepository.getById(userId);
+
+	if (!user) {
+		res.status(401).send({
+			error: `did not find user by userId ${userId} with token ${token}. Header is ${req.headers.authorization}`
+		});
+		return;
+	}
+
+	req.userId = userId;
+	next();
 }
