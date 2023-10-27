@@ -1,3 +1,4 @@
+import {randomUUID} from "node:crypto";
 import { compare, genSalt, hash } from 'bcrypt';
 
 import { IService } from './iservice';
@@ -18,7 +19,7 @@ export class UsersService implements IService<UserViewModel, UserInputModel> {
 			login: data.login,
 			email: data.email,
 			password: passwordHash,
-			id: Math.floor(Math.random() * 1000).toString(),
+			id: randomUUID(),
 			createdAt: date.toISOString(),
 		};
 

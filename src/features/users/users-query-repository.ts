@@ -22,26 +22,25 @@ export class UsersQueryRepository {
 			searchEmailTerm
 		} = options;
 
-		const filter: Filter<UserDbModel> = {};
-		const orConditions = [];
-
-		if (searchLoginTerm) {
-			orConditions.push({ login: { $regex: searchLoginTerm, $options: 'i' } });
-		}
-
-		if (searchEmailTerm) {
-			orConditions.push({ email: { $regex: searchEmailTerm, $options: 'i' } });
-		}
-
-		if (orConditions.length) {
-			filter.$or = orConditions;
-		}
+		const filter: Filter<UserDbModel> = {
+			$or: [
+				{
+					login: {
+						$regex: searchLoginTerm ?? '',
+						$options: 'i'
+					}
+				},
+				{email: {$regex: searchEmailTerm ?? '', $options: 'i'}}]
+		};
 
 		const sorting: Sort = {}
 		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
 
 		const totalCount = await this._collection.countDocuments(filter);
 		const pagesCount = Math.ceil(totalCount / pageSize);
+
+		console.log('filter', filter);
+		console.log('sorting', sorting);
 
 		const items = await this._collection
 			.find(filter, { projection: { _id: 0, password: 0 } })

@@ -11,11 +11,16 @@ export function basicAuthorization(req: Request, res: Response, next: NextFuncti
 	}
 
 	if (!req.headers.authorization) {
-		res.status(401).send();
+		res.sendStatus(401);
 		return;
 	}
 
-	const [, encoded] = req.headers.authorization.split(' ');
+	const [authType , encoded] = req.headers.authorization.split(' ');
+
+	if (authType !== 'Basic') {
+		res.sendStatus(401);
+		return;
+	}
 	const buff = Buffer.from(encoded, 'base64');
 
 	const token = buff.toString('ascii');
@@ -42,8 +47,13 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		return;
 	}
 
-	const [, encoded] = req.headers.authorization.split(' ');
-	const token = Buffer.from(encoded, 'base64').toString('ascii');
+	const [authType, token] = req.headers.authorization.split(' ');
+
+	if (authType !== 'Bearer') {
+		res.sendStatus(401);
+		return;
+	}
+
 	const userId = await jwtService.getUserIdByToken(token);
 
 	if (userId) {
@@ -56,7 +66,6 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		}
 
 		req.userId = userId;
-		console.log('userId is', req.userId);
 		next();
 		return;
 	}
