@@ -39,9 +39,6 @@ export class UsersQueryRepository {
 		const totalCount = await this._collection.countDocuments(filter);
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
-		console.log('filter', filter);
-		console.log('sorting', sorting);
-
 		const items = await this._collection
 			.find(filter, { projection: { _id: 0, password: 0 } })
 			.sort(sorting)

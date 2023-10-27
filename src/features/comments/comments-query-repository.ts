@@ -1,4 +1,4 @@
-import { Sort } from "mongodb";
+import {Filter, Sort} from "mongodb";
 
 import { CommentDbModel, CommentViewModel } from './comments-model';
 import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
@@ -13,12 +13,15 @@ export class CommentsQueryRepository {
 
 		const sorting: Sort = {}
 		sorting[sortBy] = sortDirection === SortDirection.Desc ? -1 : 1;
+		const filter: Filter<CommentDbModel> = {
+			postId: id,
+		};
 
-		const totalCount = await this._collection.countDocuments({});
+		const totalCount = await this._collection.countDocuments(filter);
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items =  await this._collection
-			.find({}, { projection: {
+			.find(filter, { projection: {
 				_id: 0,
 				postId: 0,
 			} })
