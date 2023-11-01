@@ -6,6 +6,7 @@ import { loginOrEmailValidation, passwordLoginValidation} from './auth-validatio
 import { inputValidation } from '../../middlewares/input-validation';
 import {bearerAuthorization} from "../../middlewares/authorization";
 import {UsersQueryRepository} from "../users/users-query-repository";
+import {emailValidation, passwordValidation, loginValidation} from "../users/users-validation";
 
 const authRouter = Router();
 const usersService = new UsersService();
@@ -25,5 +26,14 @@ authRouter.get(
 	bearerAuthorization,
 	controller.me
 );
+
+authRouter.post(
+	'/registration',
+	loginValidation,
+	emailValidation,
+	passwordValidation,
+	inputValidation,
+	controller.registration
+)
 
 export default authRouter;

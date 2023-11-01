@@ -8,11 +8,11 @@ import { LoginInputModel } from '../features/auth/auth-model';
 import { UsersQueryRepository } from '../features/users/users-query-repository';
 
 
-export class UsersService implements IService<UserViewModel, UserInputModel> {
+export class UsersService {
 	private _usersRepository = new UsersRepository();
 	private _usersQueryRepository = new UsersQueryRepository();
 
-	public async create(data: UserInputModel): Promise<UserViewModel> {
+	public async create(data: UserInputModel, isConfirmed: boolean): Promise<UserViewModel> {
 		const passwordHash = await this._generatePasswordHash(data.password);
 		const date = new Date();
 		const user: UserDbModel = {
@@ -21,6 +21,7 @@ export class UsersService implements IService<UserViewModel, UserInputModel> {
 			password: passwordHash,
 			id: randomUUID(),
 			createdAt: date.toISOString(),
+			isConfirmed,
 		};
 
 		return this._usersRepository.create(user);
@@ -43,7 +44,7 @@ export class UsersService implements IService<UserViewModel, UserInputModel> {
 
 		const user = await this._usersQueryRepository.getAuthData(loginOrEmail);
 
-		if (!user) {
+		if (!user || !user.isConfirmed) {
 			return null;
 		}
 

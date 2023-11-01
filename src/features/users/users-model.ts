@@ -18,6 +18,7 @@ export interface UserDbModel {
 	createdAt: string;
 	// hashed password
 	password: string;
+	isConfirmed: boolean;
 }
 
 export interface UserDbUpdateModel {

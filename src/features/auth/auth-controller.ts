@@ -20,15 +20,15 @@ export class AuthController {
 	public login = async (req: Request, res: Response): Promise<void> => {
 		const userId = await this._service.checkCredentials(req.body);
 
-		if (userId) {
-			const token = jwtService.createJWT(userId);
-			res.status(200).send({
-				accessToken: token,
-			});
+		if (!userId) {
+			res.status(401).send();
 			return;
 		}
 
-		res.status(401).send();
+		const token = jwtService.createJWT(userId);
+		res.status(200).send({
+			accessToken: token,
+		});
 	}
 
 	public me = async  (req: Request, res: Response): Promise<void> => {
@@ -51,5 +51,17 @@ export class AuthController {
 		};
 
 		res.status(200).send(data);
+	}
+
+	public registration = async (req: Request, res: Response): Promise<void> => {
+		await this._service.create({
+			login: req.body.login,
+			password: req.body.password,
+			email: req.body.email
+		}, false);
+
+
+
+		res.sendStatus(204);
 	}
 }
