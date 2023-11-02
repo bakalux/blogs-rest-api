@@ -18,12 +18,17 @@ export interface UserDbModel {
 	createdAt: string;
 	// hashed password
 	password: string;
+	isConfirmed: boolean;
+	confirmationCode?: string;
 }
 
 export interface UserDbUpdateModel {
 	login: string;
 	password: string;
 	email: string;
+	isConfirmed?: boolean;
+	confirmationCode?: string;
+	createdAt: string;
 }
 
 export interface UserDbViewModel {
@@ -31,5 +36,7 @@ export interface UserDbViewModel {
 	login: string;
 	email: string;
 	createdAt: string;
+	isConfirmed: boolean;
+	confirmationCode?: string;
 }
 

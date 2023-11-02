@@ -1,6 +1,6 @@
 import { ItemsQueryView, QueryOptions, SortDirection } from '../../common/query-options';
 import { getCollection } from '../../db';
-import {UserDbModel, UserViewModel} from './users-model';
+import {UserDbModel, UserDbViewModel, UserViewModel} from './users-model';
 import { Filter, Sort } from 'mongodb';
 import { getSkip } from '../../common/utils';
 
@@ -55,7 +55,7 @@ export class UsersQueryRepository {
 		}
 	}
 
-	public async getByLogin(login: string): Promise<UserViewModel | null> {
+	public async getByLogin(login: string): Promise<UserDbViewModel | null> {
 		const user = await this._collection.findOne({ login }, { projection: { _id: 0, password: 0 } });
 
 		if (!user) {
@@ -65,7 +65,7 @@ export class UsersQueryRepository {
 		return user;
 	}
 
-	public async getByEmail(email: string): Promise<UserViewModel | null> {
+	public async getByEmail(email: string): Promise<UserDbViewModel | null> {
 		const user = await this._collection.findOne({ email }, { projection: { _id: 0, password: 0 } });
 
 		if (!user) {
@@ -75,7 +75,7 @@ export class UsersQueryRepository {
 		return user;
 	}
 
-	public async getById(id: string): Promise<UserViewModel | null> {
+	public async getById(id: string): Promise<UserDbViewModel | null> {
 		const user = await this._collection.findOne({ id }, { projection: { _id: 0, password: 0 } });
 
 		if (!user) {
@@ -89,6 +89,16 @@ export class UsersQueryRepository {
 		const user = await this._collection.findOne({
 			$or: [{ email: loginOrEmail }, { login: loginOrEmail }]
 		}, { projection: { _id: 0 } });
+
+		if (!user) {
+			return null;
+		}
+
+		return user;
+	}
+
+	public async getByConfirmationCode(confirmationCode: string): Promise<UserDbModel | null> {
+		const user = await this._collection.findOne({ confirmationCode }, { projection: { _id: 0 } });
 
 		if (!user) {
 			return null;

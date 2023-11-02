@@ -33,7 +33,7 @@ export class UsersController {
 
 	public create = async (req: Request, res: Response): Promise<void> => {
 		const data = req.body;
-		const item = await this._service.create(data);
+		const item = await this._service.create(data, true);
 		res.status(201).send(item);
 	}
 
