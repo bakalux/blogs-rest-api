@@ -64,7 +64,7 @@ export class AuthController {
 	}
 
 	public registrationConfirmation = async (req: Request, res: Response): Promise<void> => {
-		const isConfirmed = await this._service.confirmUser(req.body.confirmationCode);
+		const isConfirmed = await this._service.confirmUser(req.body.code);
 
 		if (!isConfirmed) {
 			res.sendStatus(400);

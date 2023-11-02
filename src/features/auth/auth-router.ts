@@ -51,6 +51,7 @@ authRouter.post(
 authRouter.post(
 	'/registration-email-resending',
 	emailConfirmationResendingValidation,
+	inputValidation,
 	controller.registrationEmailResending,
 )
 
