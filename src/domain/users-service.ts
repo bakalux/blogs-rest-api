@@ -100,7 +100,7 @@ export class UsersService {
 				`
 						<h1>Email confirmation resending</h1>
 						 <p>To finish registration please follow the link below:
-							 <a href='https://somesite.com/confirm-email?code=${user.confirmationCode}'>complete registration</a>
+							 <a href='https://somesite.com/confirm-email?code=${code}'>complete registration</a>
 						 </p>
 					`
 			);
