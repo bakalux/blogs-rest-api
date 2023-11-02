@@ -2,7 +2,12 @@ import { Router } from 'express';
 
 import { AuthController } from './auth-controller';
 import { UsersService } from '../../domain/users-service';
-import { loginOrEmailValidation, passwordLoginValidation} from './auth-validation';
+import {
+	emailConfirmationResendingValidation,
+	loginOrEmailValidation,
+	passwordLoginValidation,
+	registrationConfirmationCodeValidation
+} from './auth-validation';
 import { inputValidation } from '../../middlewares/input-validation';
 import {bearerAuthorization} from "../../middlewares/authorization";
 import {UsersQueryRepository} from "../users/users-query-repository";
@@ -38,11 +43,14 @@ authRouter.post(
 
 authRouter.post(
 	'/registration-confirmation',
+	registrationConfirmationCodeValidation,
+	inputValidation,
 	controller.registrationConfirmation
 )
 
 authRouter.post(
 	'/registration-email-resending',
+	emailConfirmationResendingValidation,
 	controller.registrationEmailResending,
 )
 

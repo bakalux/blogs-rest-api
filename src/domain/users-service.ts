@@ -83,7 +83,7 @@ export class UsersService {
 	public async resendConfirmation(email: string): Promise<boolean> {
 		const user = await this._usersQueryRepository.getByEmail(email);
 
-		if (user === null || user.isConfirmed || !user.confirmationCode) {
+		if (user === null || user.isConfirmed) {
 			return false;
 		}
 
