@@ -16,10 +16,6 @@ export const registrationConfirmationCodeValidation = body('code').isString().tr
        return Promise.reject('User is already confirmed');
     }
 
-    if (user.confirmationCode !== value) {
-        return Promise.reject('Code didnt much with db code');
-    }
-
 	return Promise.resolve(true);
 });
 

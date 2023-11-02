@@ -75,15 +75,22 @@ export class UsersService {
 			return false;
 		}
 
-		const updated = await this._usersRepository.updateById(user.id, {...user, confirmationCode, isConfirmed: true});
+		const updated = await this._usersRepository.updateConfirmationDataByUserId(user.id, true, undefined);
 
-		return updated !== null;
+		return updated;
 	}
 
 	public async resendConfirmation(email: string): Promise<boolean> {
 		const user = await this._usersQueryRepository.getByEmail(email);
 
 		if (user === null || user.isConfirmed) {
+			return false;
+		}
+
+		const code = randomUUID();
+		const updated = await this._usersRepository.updateConfirmationDataByUserId(user.id, false, code);
+
+		if (!updated) {
 			return false;
 		}
 

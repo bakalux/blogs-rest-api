@@ -51,4 +51,17 @@ export class UsersRepository {
 	public async deleteAll(): Promise<void> {
 		await this._collection.deleteMany({});
 	}
+
+	public async updateConfirmationDataByUserId(userId: string, isConfirmed: boolean, code?: string): Promise<boolean> {
+		const result = await this._collection.updateOne(
+			{id: userId},
+			{$set: {
+					confirmationCode: code,
+					isConfirmed,
+				}
+			},
+		);
+
+		return result.matchedCount !== 0;
+	}
 }
