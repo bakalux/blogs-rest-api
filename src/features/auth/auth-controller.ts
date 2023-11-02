@@ -60,7 +60,27 @@ export class AuthController {
 			email: req.body.email
 		}, false);
 
+		res.sendStatus(204);
+	}
 
+	public registrationConfirmation = async (req: Request, res: Response): Promise<void> => {
+		const isConfirmed = await this._service.confirmUser(req.body.confirmationCode);
+
+		if (!isConfirmed) {
+			res.sendStatus(400);
+			return;
+		}
+
+		res.sendStatus(204);
+	}
+
+	public registrationEmailResending = async (req: Request, res: Response): Promise<void> => {
+		const isSuccessful = await this._service.resendConfirmation(req.body.email);
+
+		if (!isSuccessful) {
+			res.sendStatus(400)
+			return;
+		}
 
 		res.sendStatus(204);
 	}

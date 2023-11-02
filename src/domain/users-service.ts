@@ -1,28 +1,43 @@
 import {randomUUID} from "node:crypto";
 import { compare, genSalt, hash } from 'bcrypt';
 
-import { IService } from './iservice';
 import { UserDbModel, UserInputModel, UserViewModel } from '../features/users/users-model';
 import { UsersRepository } from '../features/users/users-repository';
 import { LoginInputModel } from '../features/auth/auth-model';
 import { UsersQueryRepository } from '../features/users/users-query-repository';
+import {emailManager} from "../managers/email-manager";
 
 
 export class UsersService {
 	private _usersRepository = new UsersRepository();
 	private _usersQueryRepository = new UsersQueryRepository();
 
-	public async create(data: UserInputModel, isConfirmed: boolean): Promise<UserViewModel> {
+	public async create(data: UserInputModel, forceConfirm: boolean): Promise<UserViewModel> {
 		const passwordHash = await this._generatePasswordHash(data.password);
 		const date = new Date();
+		const confirmationCode = forceConfirm ? undefined : randomUUID();
 		const user: UserDbModel = {
 			login: data.login,
 			email: data.email,
 			password: passwordHash,
 			id: randomUUID(),
 			createdAt: date.toISOString(),
-			isConfirmed,
+			isConfirmed: forceConfirm,
+			confirmationCode,
 		};
+
+		if (!forceConfirm) {
+			await emailManager.sendEmail(
+				'Blogs App', data.email,
+				'Email confirmation',
+				`
+						<h1>Thank for your registration</h1>
+						 <p>To finish registration please follow the link below:
+							 <a href='https://somesite.com/confirm-email?code=${confirmationCode}'>complete registration</a>
+						 </p>
+					`
+			);
+		}
 
 		return this._usersRepository.create(user);
 	}
@@ -51,6 +66,39 @@ export class UsersService {
 		const arePasswordsEqual = await this._comparePasswords(password, user.password);
 
 		return arePasswordsEqual ? user.id : null;
+	}
+
+	public async confirmUser(confirmationCode: string): Promise<boolean> {
+		const user = await this._usersQueryRepository.getByConfirmationCode(confirmationCode);
+
+		if (!user || user.isConfirmed) {
+			return false;
+		}
+
+		const updated = await this._usersRepository.updateById(user.id, {...user, confirmationCode, isConfirmed: true});
+
+		return updated !== null;
+	}
+
+	public async resendConfirmation(email: string): Promise<boolean> {
+		const user = await this._usersQueryRepository.getByEmail(email);
+
+		if (user === null || user.isConfirmed || !user.confirmationCode) {
+			return false;
+		}
+
+		await emailManager.sendEmail(
+				'Blogs App', email,
+				'Email confirmation resending',
+				`
+						<h1>Email confirmation resending</h1>
+						 <p>To finish registration please follow the link below:
+							 <a href='https://somesite.com/confirm-email?code=${user.confirmationCode}'>complete registration</a>
+						 </p>
+					`
+			);
+
+		return true;
 	}
 
 	private async _generatePasswordHash(password: string): Promise<string> {

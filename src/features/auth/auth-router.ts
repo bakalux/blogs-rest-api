@@ -36,4 +36,14 @@ authRouter.post(
 	controller.registration
 )
 
+authRouter.post(
+	'/registration-confirmation',
+	controller.registrationConfirmation
+)
+
+authRouter.post(
+	'/registration-email-resending',
+	controller.registrationEmailResending,
+)
+
 export default authRouter;
