@@ -12,7 +12,10 @@ export class UsersRepository {
 		}, {
 			projection: {
 				_id: 0,
-				password: 0
+				password: 0,
+				confirmationCode: 0,
+				isConfirmed: 0,
+				tokenBlacklist: 0,
 			}
 		});
 

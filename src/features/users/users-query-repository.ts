@@ -40,7 +40,7 @@ export class UsersQueryRepository {
 		const pagesCount = Math.ceil(totalCount / pageSize);
 
 		const items = await this._collection
-			.find(filter, { projection: { _id: 0, password: 0 } })
+			.find(filter, { projection: { _id: 0, password: 0, isConfirmed: 0, confirmationCode: 0, tokenBlacklist: 0 } })
 			.sort(sorting)
 			.skip(getSkip(pageNumber, pageSize))
 			.limit(pageSize)
