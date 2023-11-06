@@ -25,9 +25,12 @@ export class AuthController {
 			return;
 		}
 
-		const token = jwtService.createJWT(userId);
+		const accessToken = jwtService.createJWT(userId, '10s');
+		const refreshToken = jwtService.createJWT(userId, '20s');
+
+		res.cookie('refreshToken', refreshToken, {httpOnly: true,secure: true})
 		res.status(200).send({
-			accessToken: token,
+			accessToken,
 		});
 	}
 
@@ -79,6 +82,58 @@ export class AuthController {
 
 		if (!isSuccessful) {
 			res.sendStatus(400)
+			return;
+		}
+
+		res.sendStatus(204);
+	}
+
+	public refreshToken = async (req: Request, res: Response): Promise<void> => {
+		if (req.userId === null) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const user = await this._queryRepository.getById(req.userId);
+
+		if (!user) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const isBlacklistUpdated = await this._service.updateTokenBlacklist(req.userId, [...user.tokenBlacklist, req.cookies.refreshToken]);
+
+		if (!isBlacklistUpdated) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const accessToken = jwtService.createJWT(req.userId, '10s');
+		const refreshToken = jwtService.createJWT(req.userId, '20s');
+
+		res.cookie('refreshToken', refreshToken, {httpOnly: true,secure: true})
+		res.status(200).send({
+			accessToken,
+		});
+	}
+
+	public logout = async (req: Request, res: Response): Promise<void> => {
+		if (req.userId === null) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const user = await this._queryRepository.getById(req.userId);
+
+		if (!user) {
+			res.sendStatus(401);
+			return;
+		}
+
+		const isBlacklistUpdated = await this._service.updateTokenBlacklist(req.userId, [...user.tokenBlacklist, req.cookies.refreshToken]);
+
+		if (!isBlacklistUpdated) {
+			res.sendStatus(401);
 			return;
 		}
 

@@ -64,4 +64,16 @@ export class UsersRepository {
 
 		return result.matchedCount !== 0;
 	}
+
+	public async updateTokenBlacklist(userId: string, blacklist: string[]): Promise<boolean> {
+		const result = await this._collection.updateOne(
+			{id: userId},
+			{$set: {
+					tokenBlacklist: blacklist,
+				}
+			},
+		);
+
+		return result.matchedCount !== 0;
+	}
 }

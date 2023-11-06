@@ -55,4 +55,16 @@ authRouter.post(
 	controller.registrationEmailResending,
 )
 
+authRouter.post(
+	'/refresh-token',
+	bearerAuthorization,
+	controller.refreshToken
+)
+
+authRouter.post(
+	'/logout',
+	bearerAuthorization,
+	controller.logout
+)
+
 export default authRouter;

@@ -70,6 +70,22 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		return;
 	}
 
+	const cookieRefreshToken = req.cookies.refreshToken;
+
+	if (!cookieRefreshToken) {
+		res.sendStatus(401);
+		return;
+	}
+
+	const blacklist = user.tokenBlacklist;
+
+	const isBlacklisted = blacklist.some((token: string) => token === cookieRefreshToken);
+
+	if (isBlacklisted) {
+		res.sendStatus(401);
+		return;
+	}
+
 	req.userId = userId;
 	next();
 }

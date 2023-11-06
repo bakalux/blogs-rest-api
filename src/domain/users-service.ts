@@ -23,6 +23,7 @@ export class UsersService {
 			id: randomUUID(),
 			createdAt: date.toISOString(),
 			isConfirmed: forceConfirm,
+			tokenBlacklist: [],
 			confirmationCode,
 		};
 
@@ -106,6 +107,10 @@ export class UsersService {
 			);
 
 		return true;
+	}
+
+	public async updateTokenBlacklist(userId: string, blacklist: string[]): Promise<boolean> {
+		return this._usersRepository.updateTokenBlacklist(userId, blacklist)
 	}
 
 	private async _generatePasswordHash(password: string): Promise<string> {
