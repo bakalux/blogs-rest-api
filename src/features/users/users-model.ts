@@ -20,6 +20,7 @@ export interface UserDbModel {
 	password: string;
 	isConfirmed: boolean;
 	confirmationCode?: string;
+	tokenBlacklist: string[];
 }
 
 export interface UserDbUpdateModel {
@@ -38,5 +39,6 @@ export interface UserDbViewModel {
 	createdAt: string;
 	isConfirmed: boolean;
 	confirmationCode?: string;
+	tokenBlacklist: string[];
 }
 
