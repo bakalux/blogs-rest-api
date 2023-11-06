@@ -83,7 +83,6 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 	}
 
 	const userId = await jwtService.getUserIdByToken(cookieRefreshToken);
-	console.log('userId', userId);
 
 	if (!userId) {
 		res.sendStatus(401);
@@ -91,7 +90,6 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 	}
 
 	const user = await usersQueryRepository.getById(userId);
-	console.log('user', user);
 
 	if (!user) {
 		res.status(401).send({
@@ -104,7 +102,6 @@ export async function refreshTokenHandler(req: Request, res: Response, next: Nex
 	const blacklist = user.tokenBlacklist;
 
 	const isBlacklisted = blacklist.some((token: string) => token === cookieRefreshToken);
-	console.log('isBlacklisted', isBlacklisted);
 
 	if (isBlacklisted) {
 		res.sendStatus(401);
