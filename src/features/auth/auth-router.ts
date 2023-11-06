@@ -9,7 +9,7 @@ import {
 	registrationConfirmationCodeValidation
 } from './auth-validation';
 import { inputValidation } from '../../middlewares/input-validation';
-import {bearerAuthorization} from "../../middlewares/authorization";
+import {bearerAuthorization, refreshTokenHandler} from "../../middlewares/authorization";
 import {UsersQueryRepository} from "../users/users-query-repository";
 import {emailValidation, passwordValidation, loginValidation} from "../users/users-validation";
 
@@ -57,13 +57,13 @@ authRouter.post(
 
 authRouter.post(
 	'/refresh-token',
-	bearerAuthorization,
+	refreshTokenHandler,
 	controller.refreshToken
 )
 
 authRouter.post(
 	'/logout',
-	bearerAuthorization,
+	refreshTokenHandler,
 	controller.logout
 )
 

@@ -70,12 +70,34 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		return;
 	}
 
+	req.userId = userId;
+	next();
+}
+
+export async function refreshTokenHandler(req: Request, res: Response, next: NextFunction): Promise<void> {
 	const cookieRefreshToken = req.cookies.refreshToken;
 
 	if (!cookieRefreshToken) {
 		res.sendStatus(401);
 		return;
 	}
+
+	const userId = await jwtService.getUserIdByToken(cookieRefreshToken);
+
+	if (!userId) {
+		res.status(401).send();
+		return;
+	}
+
+	const user = await usersQueryRepository.getById(userId);
+
+	if (!user) {
+		res.status(401).send({
+			error: `did not find user by userId ${userId} with refresh token token ${cookieRefreshToken}. Header is ${req.headers.authorization}`
+		});
+		return;
+	}
+
 
 	const blacklist = user.tokenBlacklist;
 
@@ -86,6 +108,5 @@ export async function bearerAuthorization(req: Request, res: Response, next: Nex
 		return;
 	}
 
-	req.userId = userId;
 	next();
 }
